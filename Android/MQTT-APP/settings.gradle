@@ -1,0 +1,2 @@
+rootProject.name='MQTT-APP'
+include ':app'
