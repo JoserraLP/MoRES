@@ -22,16 +22,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
+
+        <!-- Declare all the activities -->
+
         <activity
             android:name=".DrawerActivity"
             android:label="@string/title_activity_drawer"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Declare all the metadata -->
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -40,19 +45,21 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".MainActivity">
-        </activity>
-
+        <!-- Declare all the services -->
         <service android:name="org.eclipse.paho.android.service.MqttService" />
+
         <service
             android:name=".service.BackgroundService"
             android:enabled="true"
             android:exported="true"
-            android:foregroundServiceType="location" />
+            android:foregroundServiceType="location"
+            android:permission="android.permission.ACCESS_FINE_LOCATION"/>
 
-        <receiver android:name=".MainActivity$MyReceiver" android:enabled="true"/>
-        <receiver android:name=".DrawerActivity$MyReceiver" android:enabled="true"/>
-        <receiver android:name=".ui.home.HomeFragment$LocationReceiver" android:enabled="true"/>
+        <!-- Declare all the receivers -->
+
+        <receiver android:name=".MainActivity$MyReceiver"/>
+        <receiver android:name=".DrawerActivity$MyReceiver"/>
+        <receiver android:name=".ui.home.HomeFragment$LocationReceiver"/>
     </application>
 
 </manifest>

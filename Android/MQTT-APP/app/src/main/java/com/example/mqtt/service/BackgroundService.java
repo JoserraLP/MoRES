@@ -98,6 +98,7 @@ public class BackgroundService extends Service {
      */
     private Location mLocation;
 
+
     // MQTT client
     private MQTTClient mqttClient;
 
@@ -109,6 +110,9 @@ public class BackgroundService extends Service {
     public void onCreate() {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        createLocationRequest();
+        getLastLocation();
+
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -116,9 +120,6 @@ public class BackgroundService extends Service {
                 onNewLocation(locationResult.getLastLocation());
             }
         };
-
-        createLocationRequest();
-        getLastLocation();
 
         mqttClient = MQTTClient.getInstance(this);
         mqttClient.startConnection();
@@ -275,18 +276,24 @@ public class BackgroundService extends Service {
     }
 
     private void onNewLocation(Location location) {
-        Log.i(TAG, "New location: " + location);
-
-        mLocation = location;
+        if (mLocation != null) {
+            if (mLocation.getLongitude() != location.getLongitude() && mLocation.getLatitude() != location.getLatitude()) {
+                mLocation = location;
+                Log.d(TAG, "New location");
+            }else {
+                Log.d(TAG, "Current location is the same as previous one");
+                return;
+            }
+        } else
+            mLocation = location;
 
         // Notify anyone listening for broadcasts about the new location.
         Intent intent = new Intent(ACTION_BROADCAST);
-        intent.putExtra(EXTRA_LOCATION, location);
+        intent.putExtra(EXTRA_LOCATION, mLocation);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-        //TODO Por ahora no manda la ubicacion en segundo plano, es añadir un mqttclient aqui
 
-        mqttClient.publish("Location", "Lat: " + location.getLatitude()
-                + " -> Long: " + location.getLongitude());
+        mqttClient.publish("Location", "Lat: " + mLocation.getLatitude()
+                + " -> Long: " + mLocation.getLongitude());
 
         // Update notification content if running as a foreground service.
         if (serviceIsRunningInForeground(this)) {
