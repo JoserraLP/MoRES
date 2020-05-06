@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
 
+import com.example.mqtt.client.MQTTClient;
 import com.example.mqtt.service.BackgroundService;
 import com.example.mqtt.utils.Utils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -244,7 +245,11 @@ public class DrawerActivity extends AppCompatActivity {
             Location location = intent.getParcelableExtra(BackgroundService.EXTRA_LOCATION);
             if (location != null) {
                 Log.d(TAG, location.getLatitude() + "-" + location.getLongitude());
-                //mqttClient.publish("Location", String.format("%s, %s", location.getLatitude(), location.getLongitude()));
+
+            } // TODO no llega aqui, hay que verlo
+            String news = intent.getParcelableExtra(MQTTClient.EXTRA_NEWS);
+            if (news != null){
+                Log.d(TAG, news);
             }
         }
     }

@@ -31,13 +31,19 @@
 
     <fragment
         android:id="@+id/nav_news"
-        android:name="com.example.mqtt.ui.news.NewsFragment"
+        android:name="com.example.mqtt.ui.news.view.NewsFragment"
         android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_news_info" />
 
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.example.mqtt.ui.settings.SlideshowFragment"
+        android:label="@string/menu_slideshow"
+        tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_news_item"
+        android:name="com.example.mqtt.ui.news.view.NewsItemFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
 </navigation>

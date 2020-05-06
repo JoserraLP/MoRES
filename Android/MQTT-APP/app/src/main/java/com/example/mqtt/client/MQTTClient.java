@@ -2,22 +2,34 @@ package com.example.mqtt.client;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.mqtt.utils.MQTTConfiguration;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class MQTTClient {
 
     private static final String TAG = MQTTClient.class.getSimpleName();
+
+    private static final String PACKAGE_NAME = MQTTClient.class.getName();
+
+    private static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
+
+    public static final String EXTRA_NEWS = PACKAGE_NAME + ".news";
 
     @SuppressLint("StaticFieldLeak")
     private static MQTTClient INSTANCE = null;
@@ -28,6 +40,9 @@ public class MQTTClient {
 
     private MQTTClient() {
     }
+
+    //TODO change this mqtt class
+    //https://wildanmsyah.wordpress.com/2017/05/11/mqtt-android-client-tutorial/
 
     public static MQTTClient getInstance(Context context) {
         if (INSTANCE == null) { //if there is no instance available... create new one
@@ -44,12 +59,40 @@ public class MQTTClient {
                 clientId);
 
         try {
+            client.setCallback(new MqttCallbackExtended() {
+                @Override
+                public void connectComplete(boolean b, String s) {
+                    Log.d(TAG, !b ? "Connection completed!" : "Connection failed!" );
+                }
+
+                @Override
+                public void connectionLost(Throwable throwable) {
+                    Log.d(TAG, "Connection lost");
+                }
+
+                @Override
+                public void messageArrived(String topic, MqttMessage mqttMessage) {
+                    Log.d(TAG, mqttMessage.toString());
+                    // Notify anyone listening for broadcasts about the new location.
+                    Intent intent = new Intent(ACTION_BROADCAST);
+                    intent.putExtra(EXTRA_NEWS, mqttMessage.toString());
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                }
+
+                @Override
+                public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+
+                }
+            });
             IMqttToken token = client.connect();
             token.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     // We are connected
                     Log.d(TAG, "Connected");
+
+                    //Subscribe to all relevant topics
+                    subscribe("News", 0);
                 }
 
                 @Override
@@ -97,23 +140,23 @@ public class MQTTClient {
         }
     }
 
-    public void subscribe(String topic, int qos) {
-        try {
-            IMqttToken subToken = client.subscribe(topic, qos);
-            subToken.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    // The message was received
-                }
+    private void subscribe(String topic, int qos) {
+       try {
+           if (client != null) {
+               client.subscribe(topic, qos, null, new IMqttActionListener() {
+                   @Override
+                   public void onSuccess(IMqttToken asyncActionToken) {
+                       Log.d(TAG, "Subscribed!");
+                   }
 
-                @Override
-                public void onFailure(IMqttToken asyncActionToken,
-                                      Throwable exception) {
-                    // The subscription could not be performed, maybe the user was not
-                    // authorized to subscribe on the specified topic e.g. using wildcards
-                }
-            });
+                   @Override
+                   public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        Log.d(TAG, "Subscribed fail!");
+                   }
+               });
+           }
         } catch (MqttException e) {
+            System.err.println("Exception whilst subscribing");
             e.printStackTrace();
         }
     }
