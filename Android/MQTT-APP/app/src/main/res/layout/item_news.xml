@@ -9,24 +9,25 @@
     tools:ignore="UseCompoundDrawables"
     android:clickable="true">
 
-    <ImageView
-        android:id="@+id/news_image"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_gravity="center_horizontal"
-        android:clickable="true"
-        android:focusable="true"
-        android:contentDescription="@string/news_image" />
+            <ImageView
+                android:id="@+id/news_image"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_gravity="center_horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/news_image" />
 
-    <TextView
-        android:id="@+id/news_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/news_title"
-        android:layout_gravity="center"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:layout_marginLeft="10dp"/>
+            <TextView
+                android:id="@+id/news_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/news_title"
+                android:textAlignment="textStart"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:layout_marginStart="10dp"
+                tools:ignore="RtlCompat" />
 
 </LinearLayout>

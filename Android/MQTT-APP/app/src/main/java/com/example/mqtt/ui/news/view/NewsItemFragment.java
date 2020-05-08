@@ -1,6 +1,8 @@
 package com.example.mqtt.ui.news.view;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +20,11 @@ import com.example.mqtt.R;
 import com.example.mqtt.model.News;
 import com.example.mqtt.ui.news.viewmodel.NewsViewModel;
 
+import java.util.Objects;
+
 public class NewsItemFragment extends Fragment {
+
+    private View root;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -26,29 +32,28 @@ public class NewsItemFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         //noinspection deprecation
-        NewsViewModel newsViewModel = ViewModelProviders.of(this).get(NewsViewModel.class);
+        @SuppressLint("UseRequireInsteadOfGet") NewsViewModel newsViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(NewsViewModel.class);
 
-        final View root = inflater.inflate(R.layout.fragment_news_info, container, false);
+        root = inflater.inflate(R.layout.fragment_news_info, container, false);
 
-        final ImageView news_image = root.findViewById(R.id.image_view_news);
-        final TextView news_title = root.findViewById(R.id.text_view_news_title);
-        final TextView news_date = root.findViewById(R.id.text_view_news_date_value);
-        final TextView news_description = root.findViewById(R.id.text_view_news_desc_value);
+        ImageView news_image = root.findViewById(R.id.image_view_news);
+        TextView news_title = root.findViewById(R.id.text_view_news_title);
+        TextView news_date = root.findViewById(R.id.text_view_news_date_value);
+        TextView news_description = root.findViewById(R.id.text_view_news_desc_value);
 
-        newsViewModel.getSelected().observe(getViewLifecycleOwner(), new Observer<News>() {
-            @Override
-            public void onChanged(News newsItem) {
-                Glide.with(root)
-                        .load(newsItem)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(news_image);
+        newsViewModel.getSelected().observe(requireActivity(), newsItem -> {
 
-                news_title.setText(newsItem.getTitle());
-                news_date.setText(newsItem.getDate());
-                news_description.setText(newsItem.getDescription());
-            }
+            Log.d("NewsItem", "Observing");
+
+            Glide.with(root)
+                    .load(newsItem.getImage())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(news_image);
+
+            news_title.setText(newsItem.getTitle());
+            news_date.setText(newsItem.getDate());
+            news_description.setText(newsItem.getDescription());
         });
-
 
         return root;
     }

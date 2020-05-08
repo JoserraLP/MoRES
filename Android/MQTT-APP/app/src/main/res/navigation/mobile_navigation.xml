@@ -12,38 +12,34 @@
         tools:layout="@layout/fragment_home">
 
         <action
-            android:id="@+id/action_HomeFragment_to_HomeSecondFragment"
-            app:destination="@id/nav_home_second" />
-    </fragment>
-    <fragment
-        android:id="@+id/nav_home_second"
-        android:name="com.example.mqtt.ui.home.HomeSecondFragment"
-        android:label="@string/home_second"
-        tools:layout="@layout/fragment_home_second">
+            android:id="@+id/action_nav_home_to_nav_news"
+            app:destination="@id/nav_news" />
         <action
-            android:id="@+id/action_HomeSecondFragment_to_HomeFragment"
-            app:destination="@id/nav_home" />
-
-        <argument
-            android:name="myArg"
-            app:argType="string" />
+            android:id="@+id/action_nav_home_to_nav_settings"
+            app:destination="@id/nav_settings" />
     </fragment>
+
 
     <fragment
         android:id="@+id/nav_news"
         android:name="com.example.mqtt.ui.news.view.NewsFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_news_info" />
-
-    <fragment
-        android:id="@+id/nav_settings"
-        android:name="com.example.mqtt.ui.settings.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:label="@string/menu_news"
+        tools:layout="@layout/fragment_news_info" >
+        <action
+            android:id="@+id/action_nav_news_to_nav_news_item"
+            app:destination="@id/nav_news_item" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_news_item"
         android:name="com.example.mqtt.ui.news.view.NewsItemFragment"
-        android:label="@string/menu_slideshow"
+        android:label="@string/menu_news"
+        tools:layout="@layout/fragment_slideshow" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.example.mqtt.ui.settings.SlideshowFragment"
+        android:label="@string/menu_settings"
         tools:layout="@layout/fragment_slideshow" />
 </navigation>

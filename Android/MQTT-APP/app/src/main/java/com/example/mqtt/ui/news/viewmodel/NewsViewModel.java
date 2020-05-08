@@ -5,7 +5,6 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.mqtt.data.repository.NewsRepository;
 import com.example.mqtt.model.News;
@@ -17,6 +16,8 @@ public class NewsViewModel extends AndroidViewModel {
     private NewsRepository mRepository;
 
     private LiveData<List<News>> mAllNews;
+
+    private int size;
 
     private MutableLiveData<News> selected = new MutableLiveData<>();
 

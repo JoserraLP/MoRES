@@ -16,7 +16,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -28,8 +27,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 public class BackgroundService extends Service {
 
@@ -110,9 +107,6 @@ public class BackgroundService extends Service {
     public void onCreate() {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        createLocationRequest();
-        getLastLocation();
-
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -121,13 +115,16 @@ public class BackgroundService extends Service {
             }
         };
 
-        mqttClient = MQTTClient.getInstance(this);
-        mqttClient.startConnection();
+        createLocationRequest();
+        getLastLocation();
 
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
         mServiceHandler = new Handler(handlerThread.getLooper());
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        mqttClient = MQTTClient.getInstance(this);
+        mqttClient.startConnection();
 
         // Android O requires a Notification Channel.
         CharSequence name = getString(R.string.app_name);
@@ -254,20 +251,20 @@ public class BackgroundService extends Service {
                 .setTicker(text)
                 .setWhen(System.currentTimeMillis());
 
+        // Set the Channel ID for Android O.
+        builder.setChannelId(CHANNEL_ID); // Channel ID
+
         return builder.build();
     }
 
     private void getLastLocation() {
         try {
             mFusedLocationClient.getLastLocation()
-                    .addOnCompleteListener(new OnCompleteListener<Location>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Location> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                mLocation = task.getResult();
-                            } else {
-                                Log.w(TAG, "Failed to get location.");
-                            }
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            mLocation = task.getResult();
+                        } else {
+                            Log.w(TAG, "Failed to get location.");
                         }
                     });
         } catch (SecurityException unlikely) {

@@ -28,6 +28,9 @@ public class News {
     @ColumnInfo(name = "location")
     private String location;
 
+    @ColumnInfo(name = "relevance")
+    private String relevance;
+
     public Integer getId() {
         return id;
     }
@@ -76,16 +79,25 @@ public class News {
         this.location = location;
     }
 
+    public String getRelevance() {
+        return relevance;
+    }
+
+    public void setRelevance(String relevance) {
+        this.relevance = relevance;
+    }
+
     @NonNull
     @Override
     public String toString() {
         return "News item {" +
                 " id = " + id +
                 " , title = '" + title + '\'' +
-                " , date = " + date.toString() +
+                " , date = " + date +
                 " , description = '" + description + '\'' +
                 " , image = '" + image + '\'' +
                 " , location = '" + location + '\'' +
+                " , relevance = '" + relevance + '\'' +
                 '}';
     }
 
@@ -96,7 +108,13 @@ public class News {
         }
         else{
             if (p1 instanceof News){
-                return ((News) p1).getId().equals(this.id) && ((News) p1).getTitle().equals(this.title) && ((News) p1).getDescription().equals(this.description) && ((News) p1).getDate().equals(this.date);
+                return ((News) p1).getId().equals(this.id) &&
+                        ((News) p1).getTitle().equals(this.title) &&
+                        ((News) p1).getDescription().equals(this.description) &&
+                        ((News) p1).getDate().equals(this.date) &&
+                        ((News) p1).getImage().equals(this.image) &&
+                        ((News) p1).getLocation().equals(this.location) &&
+                        ((News) p1).getRelevance().equals(this.relevance);
             }
         }
         return false;

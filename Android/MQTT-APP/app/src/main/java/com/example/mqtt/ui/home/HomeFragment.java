@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Objects;
+
+import static android.location.LocationManager.GPS_PROVIDER;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
@@ -71,13 +76,21 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         super.onResume();
 
         // Register Location receiver
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(locationReceiver,
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(locationReceiver,
                 new IntentFilter(BackgroundService.ACTION_BROADCAST));
 
         // Get the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         if (mapFragment != null)
             mapFragment.getMapAsync(this);
+
+        if (curLocation != null) {
+            if (prevMarker != null)
+                prevMarker.remove();
+            prevMarker = map.addMarker(new MarkerOptions().position(new LatLng(curLocation.getLatitude(), curLocation.getLongitude())).title("Current location"));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()), zoom));
+        }
+
     }
 
 
@@ -85,6 +98,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         // Save the map instance
         map = googleMap;
+
     }
 
     /**
@@ -102,10 +116,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                         return;
                 } else
                     curLocation = location;
+
                 if (prevMarker != null)
                     prevMarker.remove();
-                prevMarker = map.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current location"));
+                prevMarker = map.addMarker(new MarkerOptions().position(new LatLng(curLocation.getLatitude(), curLocation.getLongitude())).title("Current location"));
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()), zoom));
+
             }
         }
     }

@@ -1,6 +1,8 @@
 package com.example.mqtt.ui.news.view;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import com.example.mqtt.ui.news.ListNewsAdapter;
 import com.example.mqtt.ui.news.viewmodel.NewsViewModel;
 
 import java.util.List;
+import java.util.Objects;
 
 public class NewsFragment extends Fragment {
 
@@ -25,6 +28,7 @@ public class NewsFragment extends Fragment {
 
     private ListNewsAdapter listNewsAdapter;
 
+    @SuppressLint("UseRequireInsteadOfGet")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -32,21 +36,16 @@ public class NewsFragment extends Fragment {
 
         //noinspection deprecation
         newsViewModel =
-                ViewModelProviders.of(this).get(NewsViewModel.class);
+                ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(NewsViewModel.class);
 
         listNewsAdapter = new ListNewsAdapter(this.getContext(), newsViewModel);
 
-        newsViewModel.getAllNews().observe(getViewLifecycleOwner(), new Observer<List<News>>() {
-            @Override
-            public void onChanged(List<News> allNews) {
-                listNewsAdapter.addNewsList(allNews);
-            }
-        });
+        newsViewModel.getAllNews().observe(requireActivity(), allNews -> listNewsAdapter.addNewsList(allNews));
 
         RecyclerView recyclerView = root.findViewById(R.id.recyclerView);
         recyclerView.setAdapter(listNewsAdapter);
         recyclerView.setHasFixedSize(true);
-        final GridLayoutManager layoutManager = new GridLayoutManager(null, 3);
+        final GridLayoutManager layoutManager = new GridLayoutManager(null, 1);
         recyclerView.setLayoutManager(layoutManager);
 
         return root;

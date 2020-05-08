@@ -27,7 +27,7 @@ public class MQTTClient {
 
     private static final String PACKAGE_NAME = MQTTClient.class.getName();
 
-    private static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
+    public static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
 
     public static final String EXTRA_NEWS = PACKAGE_NAME + ".news";
 

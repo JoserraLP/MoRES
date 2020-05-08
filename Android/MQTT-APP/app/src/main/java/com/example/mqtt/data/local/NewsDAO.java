@@ -16,6 +16,9 @@ public interface NewsDAO {
     @Query("SELECT * FROM News")
     LiveData<List<News>> getAll();
 
+    @Query("SELECT COUNT(*) FROM News")
+    int getSize();
+
     @Query("SELECT * FROM News " +
             "WHERE News.date >= :date" +
             " ORDER BY News.date")

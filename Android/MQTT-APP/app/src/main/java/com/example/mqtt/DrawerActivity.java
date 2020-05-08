@@ -9,32 +9,39 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
-import android.widget.TextView;
-
-import com.example.mqtt.client.MQTTClient;
-import com.example.mqtt.service.BackgroundService;
-import com.example.mqtt.utils.Utils;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.MutableLiveData;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+
+import com.example.mqtt.client.MQTTClient;
+import com.example.mqtt.data.repository.NewsRepository;
+import com.example.mqtt.model.News;
+import com.example.mqtt.service.BackgroundService;
+import com.example.mqtt.utils.Utils;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.List;
 
 public class DrawerActivity extends AppCompatActivity {
 
@@ -53,6 +60,8 @@ public class DrawerActivity extends AppCompatActivity {
 
     // Tracks the bound state of the service.
     private boolean mBound = false;
+
+    private Location curLocation;
 
     // Monitors the state of the connection to the service.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -132,6 +141,10 @@ public class DrawerActivity extends AppCompatActivity {
         // Register Location receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver,
                 new IntentFilter(BackgroundService.ACTION_BROADCAST));
+
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver,
+                new IntentFilter(MQTTClient.ACTION_BROADCAST));
     }
 
     @Override
@@ -191,14 +204,11 @@ public class DrawerActivity extends AppCompatActivity {
                     "Location permission is needed for core functionality"
                     ,
                     Snackbar.LENGTH_INDEFINITE)
-                    .setAction("OK", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Request permission
-                            ActivityCompat.requestPermissions(DrawerActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    REQUEST_PERMISSIONS_REQUEST_CODE);
-                        }
+                    .setAction("OK", view -> {
+                        // Request permission
+                        ActivityCompat.requestPermissions(DrawerActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                REQUEST_PERMISSIONS_REQUEST_CODE);
                     })
                     .show();
 
@@ -244,12 +254,51 @@ public class DrawerActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Location location = intent.getParcelableExtra(BackgroundService.EXTRA_LOCATION);
             if (location != null) {
-                Log.d(TAG, location.getLatitude() + "-" + location.getLongitude());
-
-            } // TODO no llega aqui, hay que verlo
-            String news = intent.getParcelableExtra(MQTTClient.EXTRA_NEWS);
-            if (news != null){
+                Log.d(TAG, location.toString());
+                curLocation = location;
+            }
+            String news = intent.getStringExtra(MQTTClient.EXTRA_NEWS);
+            if (news != null && curLocation != null){
                 Log.d(TAG, news);
+                try {
+                    JSONObject jsonObject = new JSONObject(news);
+                    // Create the news object
+                    News newsItem = new News();
+
+                    Geocoder geocoder = new Geocoder(context);
+                    List<Address> addresses = geocoder.getFromLocation(curLocation.getLatitude(), curLocation.getLongitude(), 1);
+                    boolean accepted = false;
+
+                    String newsLoc = jsonObject.getString("location");
+                    String newsRel = jsonObject.getString("relevance");
+
+                    for (Address address : addresses){
+                        if (address.getLocality().equals(newsLoc)){
+                            accepted = true;
+                            break;
+                        } else if (newsRel.toLowerCase().equals("relevant") && address.getCountryName().equals(newsLoc)){
+                            accepted = true;
+                            break;
+                        } else if (newsRel.toLowerCase().equals("urgent")){ // TODO Here add a notification
+                            accepted = true;
+                            break;
+                        }
+                    }
+                    if (accepted) {
+                        newsItem.setTitle(jsonObject.getString("title"));
+                        newsItem.setDescription(jsonObject.getString("description"));
+                        newsItem.setDate(jsonObject.getString("date"));
+                        newsItem.setLocation(newsLoc);
+                        newsItem.setImage(jsonObject.getString("image"));
+                        newsItem.setRelevance(newsRel);
+
+                        NewsRepository.getInstance(getApplication()).insertNews(new MutableLiveData<>(newsItem));
+                    } else
+                        Log.d(TAG, "The news item is no relevant for the user");
+
+                } catch (JSONException | IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

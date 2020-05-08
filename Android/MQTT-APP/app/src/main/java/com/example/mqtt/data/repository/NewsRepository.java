@@ -1,6 +1,7 @@
 package com.example.mqtt.data.repository;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -84,13 +85,8 @@ public class NewsRepository {
     }
 
 
-    private void insertNews(final LiveData<News> newsItem) {
-        AppDatabase.databaseWriteExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                database.getDAO().insert(newsItem.getValue());
-            }
-        });
+    public void insertNews(final LiveData<News> newsItem) {
+        AppDatabase.databaseWriteExecutor.execute(() -> database.getDAO().insert(newsItem.getValue()));
     }
 
     public LiveData<List<News>> searchByDate(String date){

@@ -46,27 +46,21 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
         final News newsItem = data.get(position);
         holder.newsTitle.setText(newsItem.getTitle());
 
-        if(newsItem.getImage()!= null)
+        if(newsItem.getImage() != null)
             Glide.with(context)
                 .load(newsItem.getImage())
                 .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.newsImageView);
 
-        holder.newsImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                newsViewModel.select(newsItem);
-                Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_news_item);
-            }
+        holder.newsImageView.setOnClickListener(view -> {
+            newsViewModel.select(newsItem);
+            Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_news_item);
         });
 
-        holder.newsTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                newsViewModel.select(newsItem);
-                Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_news_item);
-            }
+        holder.newsTitle.setOnClickListener(view -> {
+            newsViewModel.select(newsItem);
+            Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_news_item);
         });
 
     }
@@ -84,7 +78,7 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
 
 
 
-    public ArrayList<News> getPokemon(){
+    public ArrayList<News> getNews(){
         return data;
     }
 
