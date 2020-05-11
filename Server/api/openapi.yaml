@@ -1,0 +1,174 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: jolozanop@alumnos.unex.es
+    name: JoserraLP
+    url: http://spilab.es/
+  description: This API provides the neccesary data for the TFG system
+  termsOfService: http://spilab.es/
+  title: TFG Server
+  version: "1.0"
+paths:
+  /allowed_places:
+    delete:
+      description: This deletes the current allowed places.
+      operationId: deleteAllowedPlaces
+      parameters:
+      - description: Allowed Place Type
+        explode: true
+        in: query
+        name: type
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Deleted
+                title: Deleted
+                type: string
+          description: Deleted
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+      summary: Delete the allowed place data.
+      tags:
+      - AllowedPlaces
+      x-swagger-router-controller: AllowedPlaces
+    get:
+      description: Return all the allowed places
+      operationId: getAllowedPlace
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Created
+                title: Created
+                type: string
+          description: Created
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+      summary: Return all the allowed places
+      tags:
+      - AllowedPlaces
+      x-swagger-router-controller: AllowedPlaces
+    post:
+      description: Addition of a new allowed place
+      operationId: postAllowedPlace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                type:
+                  type: string
+                  example: restaurant
+        required: true
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Created
+                title: Created
+                type: string
+          description: Created
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+        409:
+          content:
+            text/plain:
+              schema:
+                example: There is a conflict
+                title: Index conflict
+                type: string
+          description: DB index conflict
+      summary: Add a new allowed place.
+      tags:
+      - AllowedPlaces
+      x-swagger-router-controller: AllowedPlaces
+components:
+  responses:
+    201:
+      content:
+        text/plain:
+          schema:
+            example: Created
+            title: Created
+            type: string
+      description: Created
+    404:
+      content:
+        text/plain:
+          schema:
+            example: Not found
+            title: Endpoint not found
+            type: string
+      description: Not found response
+    405:
+      content:
+        text/plain:
+          schema:
+            example: The format is not valid
+            title: Invalid input
+            type: string
+      description: Invalid input
+  schemas:
+    AllowedPlaces:
+      example:
+        type: restaurant
+        idAllowedPlace: 1
+      properties:
+        idAllowedPlace:
+          example: 1
+          format: int64
+          type: integer
+        type:
+          example: restaurant
+          type: string
+      type: object
