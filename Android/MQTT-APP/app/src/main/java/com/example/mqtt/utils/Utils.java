@@ -10,6 +10,7 @@ import com.example.mqtt.R;
 import java.text.DateFormat;
 import java.util.Date;
 
+@SuppressWarnings("ALL")
 public class Utils {
 
     static final String KEY_REQUESTING_LOCATION = "requesting_location";

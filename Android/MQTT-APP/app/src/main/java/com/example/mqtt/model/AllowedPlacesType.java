@@ -6,22 +6,23 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class AllowedPlace {
+public class AllowedPlacesType {
 
     @ColumnInfo(name = "type")
     @PrimaryKey
     @NonNull
-    String type;
+    private String type;
 
-    public AllowedPlace(String type) {
+    public AllowedPlacesType(@NonNull String type) {
         this.type = type;
     }
 
+    @NonNull
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(@NonNull String type) {
         this.type = type;
     }
 }

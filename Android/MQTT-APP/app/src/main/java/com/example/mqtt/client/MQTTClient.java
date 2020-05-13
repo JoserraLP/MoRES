@@ -7,7 +7,7 @@ import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.mqtt.utils.MQTTConfiguration;
+import com.example.mqtt.utils.Constants;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -19,7 +19,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class MQTTClient {
 
@@ -30,6 +29,7 @@ public class MQTTClient {
     public static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
 
     public static final String EXTRA_NEWS = PACKAGE_NAME + ".news";
+    public static final String EXTRA_ALLOWED_PLACES = PACKAGE_NAME + ".allowed_places";
 
     @SuppressLint("StaticFieldLeak")
     private static MQTTClient INSTANCE = null;
@@ -40,9 +40,6 @@ public class MQTTClient {
 
     private MQTTClient() {
     }
-
-    //TODO change this mqtt class
-    //https://wildanmsyah.wordpress.com/2017/05/11/mqtt-android-client-tutorial/
 
     public static MQTTClient getInstance(Context context) {
         if (INSTANCE == null) { //if there is no instance available... create new one
@@ -55,7 +52,7 @@ public class MQTTClient {
 
     public void startConnection() {
         String clientId = MqttClient.generateClientId();
-        client = new MqttAndroidClient(context, MQTTConfiguration.MQTT_BROKER_URL,
+        client = new MqttAndroidClient(context, Constants.MQTT_BROKER_URL,
                 clientId);
 
         try {
@@ -72,10 +69,19 @@ public class MQTTClient {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage mqttMessage) {
-                    Log.d(TAG, mqttMessage.toString());
-                    // Notify anyone listening for broadcasts about the new location.
                     Intent intent = new Intent(ACTION_BROADCAST);
-                    intent.putExtra(EXTRA_NEWS, mqttMessage.toString());
+                    if (topic.equals("News")) {
+                        Log.d(TAG, "News: " + mqttMessage.toString());
+                        // Notify anyone listening for broadcasts about the new location.
+                        intent.putExtra(EXTRA_NEWS, mqttMessage.toString());
+
+                    }
+                    else if (topic.equals("AllowedPlaces")) {
+                        Log.d(TAG, mqttMessage.toString());
+                        // Notify anyone listening for broadcasts about the allowed places.
+                        intent.putExtra(EXTRA_ALLOWED_PLACES, mqttMessage.toString());
+
+                    }
                     LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                 }
 
@@ -93,6 +99,7 @@ public class MQTTClient {
 
                     //Subscribe to all relevant topics
                     subscribe("News", 0);
+                    subscribe("AllowedPlaces", 0);
                 }
 
                 @Override

@@ -20,27 +20,27 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AllowedPlaceRepository {
+public class AllowedPlacesTypeRepository {
 
-    private static final String TAG = AllowedPlaceRepository.class.getSimpleName();
+    private static final String TAG = AllowedPlacesTypeRepository.class.getSimpleName();
 
-    private static AllowedPlaceRepository mInstance;
+    private static AllowedPlacesTypeRepository mInstance;
 
     private RetrofitClient retrofit = RetrofitClient.getInstance();
 
     private AppDatabase database;
 
-    private static MutableLiveData<List<AllowedPlacesType>> allAllowedPlaces = new MutableLiveData<>();
+    private static MutableLiveData<List<AllowedPlacesType>> allAllowedPlacesType = new MutableLiveData<>();
 
 
-    public static synchronized AllowedPlaceRepository getInstance(Application application){
+    public static synchronized AllowedPlacesTypeRepository getInstance(Application application){
         if(mInstance == null){
-            mInstance = new AllowedPlaceRepository(application);
+            mInstance = new AllowedPlacesTypeRepository(application);
         }
         return mInstance;
     }
 
-    private AllowedPlaceRepository(Application application) {
+    private AllowedPlacesTypeRepository(Application application) {
         database = AppDatabase.getDatabase(application);
     }
 
@@ -54,7 +54,7 @@ public class AllowedPlaceRepository {
                     AllowedPlacesTypeResponse allowedPlacesTypeResponse = response.body();
                     assert allowedPlacesTypeResponse != null;
                     ArrayList<AllowedPlacesType> listAllowedPlacesTypes = allowedPlacesTypeResponse.getResults();
-                    allAllowedPlaces.setValue(listAllowedPlacesTypes);
+                    allAllowedPlacesType.setValue(listAllowedPlacesTypes);
                     for (AllowedPlacesType place : listAllowedPlacesTypes)
                         insertAllowedPlace(new MutableLiveData<>(place));
 

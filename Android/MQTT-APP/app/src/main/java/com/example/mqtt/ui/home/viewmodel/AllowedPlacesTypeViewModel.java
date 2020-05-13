@@ -10,13 +10,13 @@ import com.example.mqtt.model.AllowedPlacesType;
 
 import java.util.List;
 
-public class AllowedPlacesViewModel extends AndroidViewModel {
+public class AllowedPlacesTypeViewModel extends AndroidViewModel {
 
     private AllowedPlacesTypeRepository mRepository;
 
     private LiveData<List<AllowedPlacesType>> mAllAllowedPlaces;
 
-    public AllowedPlacesViewModel(Application application) {
+    public AllowedPlacesTypeViewModel(Application application) {
         super(application);
         mRepository = AllowedPlacesTypeRepository.getInstance(application);
         mAllAllowedPlaces = mRepository.getAllAllowedPlaces();

@@ -4,7 +4,7 @@ import com.example.mqtt.model.AllowedPlacesType;
 
 import java.util.ArrayList;
 
-public class AllowedPlacesResponse {
+public class AllowedPlacesTypeResponse {
 
     private ArrayList<AllowedPlacesType> results;
 

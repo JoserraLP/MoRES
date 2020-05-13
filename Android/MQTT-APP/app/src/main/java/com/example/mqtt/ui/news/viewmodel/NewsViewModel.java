@@ -17,8 +17,6 @@ public class NewsViewModel extends AndroidViewModel {
 
     private LiveData<List<News>> mAllNews;
 
-    private int size;
-
     private MutableLiveData<News> selected = new MutableLiveData<>();
 
     private MutableLiveData<String> mText;

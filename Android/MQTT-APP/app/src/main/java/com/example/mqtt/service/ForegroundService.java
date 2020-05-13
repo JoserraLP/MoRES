@@ -30,11 +30,11 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-public class BackgroundService extends Service {
+public class ForegroundService extends Service {
 
-    private static final String PACKAGE_NAME = BackgroundService.class.getName();
+    private static final String PACKAGE_NAME = ForegroundService.class.getName();
 
-    private static final String TAG = BackgroundService.class.getSimpleName();
+    private static final String TAG = ForegroundService.class.getSimpleName();
 
     /**
      * The name of the channel for notifications.
@@ -99,12 +99,12 @@ public class BackgroundService extends Service {
 
 
     // MQTT client
-    private MQTTClient mqttClient;
+    //private MQTTClient mqttClient;
 
     private Receiver receiver;
 
 
-    public BackgroundService() {
+    public ForegroundService() {
     }
 
     @Override
@@ -127,14 +127,14 @@ public class BackgroundService extends Service {
         mServiceHandler = new Handler(handlerThread.getLooper());
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        mqttClient = MQTTClient.getInstance(this);
-        mqttClient.startConnection();
+        //mqttClient = MQTTClient.getInstance(this);
+        //mqttClient.startConnection();
 
         // Register the receiver
         receiver = new Receiver(getApplication());
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
-                new IntentFilter(BackgroundService.ACTION_BROADCAST));
+                new IntentFilter(ForegroundService.ACTION_BROADCAST));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
                 new IntentFilter(MQTTClient.ACTION_BROADCAST));
@@ -152,14 +152,7 @@ public class BackgroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service started");
-        boolean startedFromNotification = intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION,
-                false);
 
-        // We got here because the user decided to remove location updates from the notification.
-        if (startedFromNotification) {
-            removeLocationUpdates();
-            stopSelf();
-        }
         // Tells the system to not try to recreate the service after it has been killed.
         return START_NOT_STICKY;
     }
@@ -199,9 +192,8 @@ public class BackgroundService extends Service {
         // Called when the last client (MainActivity in case of this sample) unbinds from this
         // service. If this method is called due to a configuration change in MainActivity, we
         // do nothing. Otherwise, we make this service a foreground service.
-        if (!mChangingConfiguration && Utils.requestingLocationUpdates(this)) {
+        if (!mChangingConfiguration) {
             Log.i(TAG, "Starting foreground service");
-
             startForeground(NOTIFICATION_ID, getNotification());
         }
         return true; // Ensures onRebind() is called when a client re-binds.
@@ -219,30 +211,12 @@ public class BackgroundService extends Service {
      */
     public void requestLocationUpdates() {
         Log.i(TAG, "Requesting location updates");
-        Utils.setRequestingLocationUpdates(this, true);
-        startService(new Intent(getApplicationContext(), BackgroundService.class));
+        startService(new Intent(getApplicationContext(), ForegroundService.class));
         try {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                     mLocationCallback, Looper.myLooper());
         } catch (SecurityException unlikely) {
-            Utils.setRequestingLocationUpdates(this, false);
             Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
-        }
-    }
-
-    /**
-     * Removes location updates. Note that in this sample we merely log the
-     * {@link SecurityException}.
-     */
-    public void removeLocationUpdates() {
-        Log.i(TAG, "Removing location updates");
-        try {
-            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
-            Utils.setRequestingLocationUpdates(this, false);
-            stopSelf();
-        } catch (SecurityException unlikely) {
-            Utils.setRequestingLocationUpdates(this, true);
-            Log.e(TAG, "Lost location permission. Could not remove updates. " + unlikely);
         }
     }
 
@@ -250,7 +224,7 @@ public class BackgroundService extends Service {
      * Returns the {@link NotificationCompat} used as part of the foreground service.
      */
     private Notification getNotification() {
-        Intent intent = new Intent(this, BackgroundService.class);
+        Intent intent = new Intent(this, ForegroundService.class);
 
         CharSequence text = Utils.getLocationText(mLocation);
 
@@ -276,7 +250,12 @@ public class BackgroundService extends Service {
             mFusedLocationClient.getLastLocation()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful() && task.getResult() != null) {
+                            Log.w(TAG, "Success to get location.");
                             mLocation = task.getResult();
+                            // Notify anyone listening for broadcasts about the new location.
+                            Intent intent = new Intent(ACTION_BROADCAST);
+                            intent.putExtra(EXTRA_LOCATION, mLocation);
+                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                         } else {
                             Log.w(TAG, "Failed to get location.");
                         }
@@ -287,24 +266,10 @@ public class BackgroundService extends Service {
     }
 
     private void onNewLocation(Location location) {
-        if (mLocation != null) {
-            if (mLocation.getLongitude() != location.getLongitude() && mLocation.getLatitude() != location.getLatitude()) {
-                mLocation = location;
-                Log.d(TAG, "New location");
-            }else {
-                Log.d(TAG, "Current location is the same as previous one");
-                return;
-            }
-        } else
-            mLocation = location;
-
         // Notify anyone listening for broadcasts about the new location.
         Intent intent = new Intent(ACTION_BROADCAST);
-        intent.putExtra(EXTRA_LOCATION, mLocation);
+        intent.putExtra(EXTRA_LOCATION, location);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
-        mqttClient.publish("Location", "Lat: " + mLocation.getLatitude()
-                + " -> Long: " + mLocation.getLongitude());
 
         // Update notification content if running as a foreground service.
         if (serviceIsRunningInForeground(this)) {
@@ -327,8 +292,8 @@ public class BackgroundService extends Service {
      * clients, we don't need to deal with IPC.
      */
     public class LocalBinder extends Binder {
-        public BackgroundService getService() {
-            return BackgroundService.this;
+        public ForegroundService getService() {
+            return ForegroundService.this;
         }
     }
 

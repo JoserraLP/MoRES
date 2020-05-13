@@ -29,4 +29,6 @@
     <string name="home_second">Home Second</string>
     <string name="news_image">News image</string>
     <string name="news_title">News title</string>
+    <string name="date_title">Date:</string>
+    <string name="author_title">Author:</string>
 </resources>

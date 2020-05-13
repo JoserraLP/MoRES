@@ -6,17 +6,17 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.example.mqtt.model.AllowedPlace;
+import com.example.mqtt.model.AllowedPlacesType;
 
 import java.util.List;
 
 @Dao
-public interface AllowedPlacesDAO {
+public interface AllowedPlacesTypeDAO {
 
-    @Query("SELECT * FROM AllowedPlace")
-    LiveData<List<AllowedPlace>> getAll();
+    @Query("SELECT * FROM AllowedPlacesType")
+    LiveData<List<AllowedPlacesType>> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(AllowedPlace allowedPlace);
+    void insert(AllowedPlacesType allowedPlacesType);
 
 }

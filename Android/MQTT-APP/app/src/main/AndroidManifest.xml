@@ -21,7 +21,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup">
+
+        <!-- For localhost retrofit -->
+        <!-- android:usesCleartextTraffic="true" -->
+
 
         <!-- Declare all the activities -->
 
@@ -44,21 +49,25 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <!-- Declare all the library uses -->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false"/>
+
         <!-- Declare all the services -->
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
         <service
-            android:name=".service.BackgroundService"
+            android:name=".service.ForegroundService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location"
-            android:permission="android.permission.ACCESS_FINE_LOCATION"/>
+            android:permission="android.permission.ACCESS_FINE_LOCATION" />
 
         <!-- Declare all the receivers -->
 
-        <receiver android:name=".MainActivity$MyReceiver"/>
-        <receiver android:name=".DrawerActivity$MyReceiver"/>
         <receiver android:name=".ui.home.HomeFragment$LocationReceiver"/>
+        <receiver android:name=".receiver.Receiver"/>
     </application>
 
 </manifest>
