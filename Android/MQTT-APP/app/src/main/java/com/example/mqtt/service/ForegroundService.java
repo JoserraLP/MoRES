@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Binder;
@@ -21,6 +22,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.mqtt.R;
 import com.example.mqtt.client.MQTTClient;
+import com.example.mqtt.receiver.Receiver;
 import com.example.mqtt.utils.Utils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -99,6 +101,8 @@ public class BackgroundService extends Service {
     // MQTT client
     private MQTTClient mqttClient;
 
+    private Receiver receiver;
+
 
     public BackgroundService() {
     }
@@ -125,6 +129,15 @@ public class BackgroundService extends Service {
 
         mqttClient = MQTTClient.getInstance(this);
         mqttClient.startConnection();
+
+        // Register the receiver
+        receiver = new Receiver(getApplication());
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+                new IntentFilter(BackgroundService.ACTION_BROADCAST));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+                new IntentFilter(MQTTClient.ACTION_BROADCAST));
 
         // Android O requires a Notification Channel.
         CharSequence name = getString(R.string.app_name);
@@ -197,6 +210,7 @@ public class BackgroundService extends Service {
     @Override
     public void onDestroy() {
         mServiceHandler.removeCallbacksAndMessages(null);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     /**

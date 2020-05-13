@@ -68,7 +68,7 @@ module.exports.getAllowedPlace = function(req, res, next) {
             if (err) throw err;
             console.log("Allowed places: " + JSON.stringify(result));
             res.send({
-                message: result
+                results: result
             });
             db.close();
         }); 
