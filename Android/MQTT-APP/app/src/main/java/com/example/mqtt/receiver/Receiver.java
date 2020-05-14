@@ -3,6 +3,7 @@ package com.example.mqtt.receiver;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.mqtt.DrawerActivity;
 import com.example.mqtt.R;
 import com.example.mqtt.client.MQTTClient;
 import com.example.mqtt.data.repository.AllowedPlacesTypeRepository;
@@ -43,6 +45,12 @@ public class Receiver extends BroadcastReceiver {
 
     // MQTT client
     private MQTTClient mqttClient;
+
+    // For intent creation
+    private static final String PACKAGE_NAME = Receiver.class.getName();
+
+    private static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
+            ".started_from_notification";
 
     public Receiver(Application application){
         this.application = application;
@@ -147,8 +155,20 @@ public class Receiver extends BroadcastReceiver {
     }
 
     public void createNotification (Context context, String title, String description) {
+
+        Intent intent = new Intent(context, Receiver.class);
+
+        // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
+        intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
+
+        // The PendingIntent to launch activity.
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
+                new Intent(context, DrawerActivity.class), 0);
+
         // Create the Notification builder
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .addAction(R.drawable.ic_launch, context.getString(R.string.launch_activity),
+                        activityPendingIntent)
                 .setSmallIcon(R.drawable.ic_launch)
                 .setContentTitle(title)
                 .setContentText(description)

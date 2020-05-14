@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.example.mqtt.DrawerActivity;
 import com.example.mqtt.R;
 import com.example.mqtt.client.MQTTClient;
 import com.example.mqtt.receiver.Receiver;
@@ -231,7 +233,13 @@ public class ForegroundService extends Service {
         // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
 
+        // The PendingIntent to launch activity.
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, DrawerActivity.class), 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .addAction(R.drawable.ic_launch, getString(R.string.launch_activity),
+                        activityPendingIntent)
                 .setContentText(text)
                 .setContentTitle(Utils.getLocationTitle(this))
                 .setOngoing(true)

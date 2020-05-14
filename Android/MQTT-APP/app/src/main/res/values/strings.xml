@@ -31,4 +31,5 @@
     <string name="news_title">News title</string>
     <string name="date_title">Date:</string>
     <string name="author_title">Author:</string>
+    <string name="launch_activity">Open application</string>
 </resources>
