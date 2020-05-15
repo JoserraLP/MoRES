@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -71,8 +72,22 @@ public class Receiver extends BroadcastReceiver {
             if (curLocation != null) {
                 if (curLocation.getLongitude() != location.getLongitude() && curLocation.getLatitude() != location.getLatitude()) {
                     curLocation = location;
-                    mqttClient.publish("Location", "Lat: " + curLocation.getLatitude()
-                            + " -> Long: " + curLocation.getLongitude());
+
+                    SharedPreferences pref = application.getSharedPreferences("MyPref", 0); // 0 - for private mode
+                    String deviceID = pref.getString("DeviceID", null);
+                    if (deviceID != null) {
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("_id", deviceID);
+                            jsonObject.put("geo_lat", curLocation.getLatitude());
+                            jsonObject.put("geo_long", curLocation.getLongitude());
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        mqttClient.publish("Location", jsonObject.toString());
+                    }
+
                 }
                 else
                     return;

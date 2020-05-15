@@ -248,7 +248,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                     }
                 });
 
-// Add the request to the RequestQueue.
+                // Add the request to the RequestQueue.
                 queue.add(stringRequest);
 
                  */

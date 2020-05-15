@@ -2,6 +2,7 @@
 
 package com.example.mqtt.data.remote;
 
+import com.example.mqtt.model.DeviceID;
 import com.example.mqtt.utils.Constants;
 
 import retrofit2.Retrofit;
@@ -29,8 +30,12 @@ public class RetrofitClient {
         return mInstance;
     }
 
-    public AllowedPlacesTypeService getAPI(){
+    public AllowedPlacesTypeService getAllowedPlacesTypeServiceAPI(){
         return retrofit.create(AllowedPlacesTypeService.class);
+    }
+
+    public DeviceIDService getDeviceIDAPI(){
+        return retrofit.create(DeviceIDService.class);
     }
 
 }

@@ -45,7 +45,7 @@ public class AllowedPlacesTypeRepository {
     }
 
     public void loadAllAllowedPlaces() {
-        Call<AllowedPlacesTypeResponse> allowedPlacesResponseCall = retrofit.getAPI().getAllowedPlacesType();
+        Call<AllowedPlacesTypeResponse> allowedPlacesResponseCall = retrofit.getAllowedPlacesTypeServiceAPI().getAllowedPlacesType();
 
         allowedPlacesResponseCall.enqueue(new Callback<AllowedPlacesTypeResponse>() {
             @Override
