@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -23,9 +24,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.mqtt.data.repository.AllowedPlacesTypeRepository;
+import com.example.mqtt.data.repository.DeviceIDRepository;
 import com.example.mqtt.service.ForegroundService;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.Objects;
 
 public class DrawerActivity extends AppCompatActivity {
 
@@ -49,6 +53,13 @@ public class DrawerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+
+        if (pref.getString("DeviceID", null) == null) {
+            // Load all the allowed places
+            DeviceIDRepository.getInstance(getApplication()).loadDeviceID();
+        }
 
         setContentView(R.layout.activity_drawer);
         Toolbar toolbar = findViewById(R.id.toolbar);
