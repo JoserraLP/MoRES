@@ -5,37 +5,34 @@ var mongoClient = require('mongodb').MongoClient;
 var mongoURL = "mongodb://localhost:27017/"
 
 // DB and Collection creation
+/*
 mongoClient.connect(mongoURL, function(err, db) {
     if (err) throw err;
-    console.log("Database created!");
     var dbase = db.db("tfg");
-    dbase.createCollection("allowed_places", function(err, res){
+    dbase.createCollection("allowed_places_types", function(err, res){
         if (err) throw err;
-        console.log("Collection created!");
     });
-    dbase.collection("allowed_places").createIndex({"type": 1}, {unique : true});
-    db.close();
+    dbase.collection("allowed_places_types").createIndex({"type": 1}, {unique : true});
 }); 
-
+*/
 
 /**
- * Delete the allowed place data.
- * This deletes the current allowed places.
+ * Delete the allowed place type.
+ * This deletes the current allowed places type.
  *
- * idAllowedPlace Integer Allowed Place ID
+ * idAllowedPlace Integer Allowed Place Type ID
  * returns String
  **/
-module.exports.deleteAllowedPlaces = function(req, res, next) {
+module.exports.deleteAllowedPlacesType = function(req, res, next) {
     //Parameters
     console.log("Request: " + JSON.stringify(req));
     mongoClient.connect(mongoURL, function(err, db) {
         if (err) throw err;
         var query = { type : req.type.value };
         var dbase = db.db("tfg");
-        dbase.collection("allowed_places").deleteOne(query, function(err, obj) {
+        dbase.collection("allowed_places_types").deleteOne(query, function(err, obj) {
             if (err) throw err;
             console.log("Allowed place with type " + req.type.value + " succesfully deleted");
-            db.close();
         }) 
     });
     res.send({
@@ -45,18 +42,18 @@ module.exports.deleteAllowedPlaces = function(req, res, next) {
 
 
 /**
- * Return all the allowed places
- * Return all the allowed places
+ * Return all the allowed places types
+ * Return all the allowed places types
  *
  * returns String
  **/
-module.exports.getAllowedPlace = function(req, res, next) {
+module.exports.getAllowedPlacesType = function(req, res, next) {
     //Parameters
     console.log("Request: " + JSON.stringify(req));
     mongoClient.connect(mongoURL, function(err, db) {
         if (err) throw err;
         var dbase = db.db("tfg");
-        dbase.collection("allowed_places").aggregate(
+        dbase.collection("allowed_places_types").aggregate(
                 [
                     { $project : // Exclude the _id field
                         {  
@@ -66,11 +63,10 @@ module.exports.getAllowedPlace = function(req, res, next) {
                     }
                 ]).toArray(function(err, result) {
             if (err) throw err;
-            console.log("Allowed places: " + JSON.stringify(result));
+            console.log("Allowed places types: " + JSON.stringify(result));
             res.send({
                 results: result
             });
-            db.close();
         }); 
     });
 };
@@ -83,7 +79,7 @@ module.exports.getAllowedPlace = function(req, res, next) {
  * allowedPlaces AllowedPlaces 
  * returns String
  **/
-module.exports.postAllowedPlace = function(req, res, next) {
+module.exports.postAllowedPlaceType = function(req, res, next) {
     //Parameters
     console.log("Request: " + JSON.stringify(req));
     mongoClient.connect(mongoURL, function(err, db) {
@@ -92,19 +88,18 @@ module.exports.postAllowedPlace = function(req, res, next) {
         var data = {
             type: req.undefined.value.type
         }
-        dbase.collection("allowed_places").insertOne(data, function(err, response) {
+        dbase.collection("allowed_places_types").insertOne(data, function(err, response) {
             if (err) {
                 res.statusCode = 409 
                 res.send({
-                    message: "The allowed place " + req.undefined.value.type + " already exists"
+                    message: "The allowed place with type " + req.undefined.value.type + " already exists"
                 })
                 throw err;
             }
             res.send({
-                message: "Allowed place " + req.undefined.value.type + " succesfully added"
+                message: "Allowed place with type " + req.undefined.value.type + " succesfully added"
             });
-            console.log("Allowed place " + req.undefined.value.type + " succesfully added");
-            db.close();
+            console.log("Allowed place with type" + req.undefined.value.type + " succesfully added");
         }); 
     });
 };

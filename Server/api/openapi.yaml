@@ -9,10 +9,10 @@ info:
   title: TFG Server
   version: "1.0"
 paths:
-  /allowed_places:
+  /allowed_places_types:
     delete:
-      description: This deletes the current allowed places.
-      operationId: deleteAllowedPlaces
+      description: This deletes the current allowed places type.
+      operationId: deleteAllowedPlacesType
       parameters:
       - description: Allowed Place Type
         explode: true
@@ -47,13 +47,13 @@ paths:
                 title: Invalid input
                 type: string
           description: Invalid input
-      summary: Delete the allowed place data.
+      summary: Delete the allowed place type.
       tags:
-      - AllowedPlaces
-      x-swagger-router-controller: AllowedPlaces
+      - AllowedPlacesType
+      x-swagger-router-controller: AllowedPlacesType
     get:
-      description: Return all the allowed places
-      operationId: getAllowedPlace
+      description: Return all the allowed places types
+      operationId: getAllowedPlacesType
       responses:
         201:
           content:
@@ -79,13 +79,13 @@ paths:
                 title: Invalid input
                 type: string
           description: Invalid input
-      summary: Return all the allowed places
+      summary: Return all the allowed places types
       tags:
-      - AllowedPlaces
-      x-swagger-router-controller: AllowedPlaces
+      - AllowedPlacesType
+      x-swagger-router-controller: AllowedPlacesType
     post:
-      description: Addition of a new allowed place
-      operationId: postAllowedPlace
+      description: Addition of a new allowed place type
+      operationId: postAllowedPlaceType
       requestBody:
         content:
           application/json:
@@ -128,10 +128,124 @@ paths:
                 title: Index conflict
                 type: string
           description: DB index conflict
-      summary: Add a new allowed place.
+      summary: Add a new allowed place type.
       tags:
-      - AllowedPlaces
-      x-swagger-router-controller: AllowedPlaces
+      - AllowedPlacesType
+      x-swagger-router-controller: AllowedPlacesType
+  /device_id:
+    delete:
+      description: This deletes the device ID.
+      operationId: deleteDeviceID
+      parameters:
+      - description: Device ID
+        explode: true
+        in: query
+        name: deviceID
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Deleted
+                title: Deleted
+                type: string
+          description: Deleted
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+      summary: Delete the device ID.
+      tags:
+      - DeviceID
+      x-swagger-router-controller: DeviceID
+    get:
+      description: Return all the devices ID
+      operationId: getDeviceID
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Created
+                title: Created
+                type: string
+          description: Created
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+      summary: Return all the devices ID
+      tags:
+      - DeviceID
+      x-swagger-router-controller: DeviceID
+    post:
+      description: Creation of a new device ID
+      operationId: postDeviceID
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Created
+                title: Created
+                type: string
+          description: Created
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+        409:
+          content:
+            text/plain:
+              schema:
+                example: There is a conflict
+                title: Index conflict
+                type: string
+          description: DB index conflict
+      summary: Add a new device ID.
+      tags:
+      - DeviceID
+      x-swagger-router-controller: DeviceID
 components:
   responses:
     201:
@@ -159,12 +273,12 @@ components:
             type: string
       description: Invalid input
   schemas:
-    AllowedPlaces:
+    AllowedPlacesType:
       example:
         type: restaurant
-        idAllowedPlace: 1
+        idAllowedPlacesType: 1
       properties:
-        idAllowedPlace:
+        idAllowedPlacesType:
           example: 1
           format: int64
           type: integer
