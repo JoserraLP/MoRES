@@ -5,37 +5,62 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.Objects;
+
 @Entity
 public class AllowedPlaces {
 
+    @SerializedName("id")
+    @Expose
     @PrimaryKey
-    private int id;
+    @ColumnInfo(name = "id")
+    private String id;
 
+    @SerializedName("name")
+    @Expose
     @ColumnInfo(name = "name")
     private String name;
 
-    @ColumnInfo(name = "geoLat")
-    private double geoLat;
+    @SerializedName("types")
+    @Expose
+    @ColumnInfo(name = "type")
+    private String types;
 
-    @ColumnInfo(name = "geoLong")
-    private double geoLong;
+    @SerializedName("geo_lat")
+    @Expose
+    @ColumnInfo(name = "geo_lat")
+    private double geo_lat;
 
-    @ColumnInfo(name = "type") // TODO ask if it is better to have a foreign key
-    private String type;
+    @SerializedName("geo_long")
+    @Expose
+    @ColumnInfo(name = "geo_long")
+    private double geo_long;
 
-    public AllowedPlaces(int id, String name, double geoLat, double geoLong, String type) {
-        this.id = id;
-        this.name = name;
-        this.geoLat = geoLat;
-        this.geoLong = geoLong;
-        this.type = type;
+    @SerializedName("icon")
+    @Expose
+    @ColumnInfo(name = "icon")
+    private String icon;
+
+    public AllowedPlaces() {
     }
 
-    public int getId() {
+    public AllowedPlaces(String id, String name, String types, double geo_lat, double geo_long, String icon) {
+        this.id = id;
+        this.name = name;
+        this.types = types;
+        this.geo_lat = geo_lat;
+        this.geo_long = geo_long;
+        this.icon = icon;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -47,57 +72,62 @@ public class AllowedPlaces {
         this.name = name;
     }
 
-    public double getGeoLat() {
-        return geoLat;
+    public String getTypes() {
+        return types;
     }
 
-    public void setGeoLat(double geoLat) {
-        this.geoLat = geoLat;
+    public void setTypes(String types) {
+        this.types = types;
     }
 
-    public double getGeoLong() {
-        return geoLong;
+    public double getGeo_lat() {
+        return geo_lat;
     }
 
-    public void setGeoLong(double geoLong) {
-        this.geoLong = geoLong;
+    public void setGeo_lat(double geo_lat) {
+        this.geo_lat = geo_lat;
     }
 
-    public String getType() {
-        return type;
+    public double getGeo_long() {
+        return geo_long;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setGeo_long(double geo_long) {
+        this.geo_long = geo_long;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return "News item {" +
-                " id = " + id +
-                " , name = '" + name + '\'' +
-                " , geoLat = '" + geoLat + '\'' +
-                " , geoLong = " + geoLong +
-                " , type = '" + type + '\'' +
+        return "AllowedPlaces{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", types='" + types + '\'' +
+                ", geo_lat=" + geo_lat +
+                ", geo_long=" + geo_long +
+                ", icon='" + icon + '\'' +
                 '}';
     }
 
     @Override
-    public boolean equals(Object p1){
-        if (!p1.getClass().isInstance(AllowedPlaces.class)) {
-            return false;
-        } else {
-            if (p1 instanceof AllowedPlaces){
-                return ((AllowedPlaces) p1).getId() == (this.id) &&
-                        ((AllowedPlaces) p1).getName().equals(this.name) &&
-                        ((AllowedPlaces) p1).getGeoLat() == (this.geoLat) &&
-                        ((AllowedPlaces) p1).getGeoLong() == (this.geoLong) &&
-                        ((AllowedPlaces) p1).getType().equals(this.type);
-            }
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AllowedPlaces that = (AllowedPlaces) o;
+        return Double.compare(that.geo_lat, geo_lat) == 0 &&
+                Double.compare(that.geo_long, geo_long) == 0 &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(types, that.types) &&
+                Objects.equals(icon, that.icon);
     }
-
 
 }

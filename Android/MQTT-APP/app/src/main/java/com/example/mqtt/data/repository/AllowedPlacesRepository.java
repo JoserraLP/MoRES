@@ -8,9 +8,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mqtt.data.local.AppDatabase;
-import com.example.mqtt.data.remote.AllowedPlacesTypeResponse;
-import com.example.mqtt.data.remote.RetrofitClient;
-import com.example.mqtt.model.AllowedPlacesType;
+import com.example.mqtt.data.remote.AllowedPlacesResponse;
+import com.example.mqtt.data.remote.AllowedPlacesResponseItem;
+import com.example.mqtt.data.remote.PlacesRetrofitClient;
+import com.example.mqtt.model.AllowedPlaces;
+import com.example.mqtt.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,61 +22,77 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AllowedPlacesTypeRepository {
+public class AllowedPlacesRepository {
 
-    private static final String TAG = AllowedPlacesTypeRepository.class.getSimpleName();
+    private static final String TAG = AllowedPlacesRepository.class.getSimpleName();
 
-    private static AllowedPlacesTypeRepository mInstance;
+    private static AllowedPlacesRepository mInstance;
 
-    private RetrofitClient retrofit = RetrofitClient.getInstance();
+    private PlacesRetrofitClient retrofit = PlacesRetrofitClient.getInstance();
 
     private AppDatabase database;
 
-    private static MutableLiveData<List<AllowedPlacesType>> allAllowedPlacesType = new MutableLiveData<>();
 
-
-    public static synchronized AllowedPlacesTypeRepository getInstance(Application application){
+    public static synchronized AllowedPlacesRepository getInstance(Application application){
         if(mInstance == null){
-            mInstance = new AllowedPlacesTypeRepository(application);
+            mInstance = new AllowedPlacesRepository(application);
         }
         return mInstance;
     }
 
-    private AllowedPlacesTypeRepository(Application application) {
+    private AllowedPlacesRepository(Application application) {
         database = AppDatabase.getDatabase(application);
     }
 
-    public void loadAllAllowedPlaces() {
-        Call<AllowedPlacesTypeResponse> allowedPlacesResponseCall = retrofit.getAllowedPlacesTypeServiceAPI().getAllowedPlacesType();
+    public void loadAllowedPlacesByLocation(String location) {
 
-        allowedPlacesResponseCall.enqueue(new Callback<AllowedPlacesTypeResponse>() {
+        Call<AllowedPlacesResponse> allowedPlacesResponseCall = retrofit.getAllowedPlacesServiceAPI().getAllowedPlaces(location, String.valueOf(Constants.SIZE_PLACES_API_REQUEST), Constants.PLACES_API_ID, Constants.PLACES_API_CODE); // TODO make the call to the server
+
+        allowedPlacesResponseCall.enqueue(new Callback<AllowedPlacesResponse>() {
             @Override
-            public void onResponse(@NonNull Call<AllowedPlacesTypeResponse> call, @NonNull Response<AllowedPlacesTypeResponse> response) {
+            public void onResponse(@NonNull Call<AllowedPlacesResponse> call, @NonNull Response<AllowedPlacesResponse> response) {
                 if (response.isSuccessful()) {
-                    AllowedPlacesTypeResponse allowedPlacesTypeResponse = response.body();
-                    assert allowedPlacesTypeResponse != null;
-                    ArrayList<AllowedPlacesType> listAllowedPlacesTypes = allowedPlacesTypeResponse.getResults();
-                    allAllowedPlacesType.setValue(listAllowedPlacesTypes);
-                    for (AllowedPlacesType place : listAllowedPlacesTypes)
-                        insertAllowedPlace(new MutableLiveData<>(place));
+                    AllowedPlacesResponse allowedPlacesResponse = response.body();
+                    assert allowedPlacesResponse != null;
+                    AllowedPlacesResponse.Results results = allowedPlacesResponse.getResults();
+                    if (results != null){
+                        ArrayList<AllowedPlacesResponseItem> listAllowedPlaces = results.getItems();
+                        for (AllowedPlacesResponseItem placesResponseItem : listAllowedPlaces) {
+                            insertAllowedPlace(new MutableLiveData<>(processResponseItem(placesResponseItem)));
+                        }
+                    }
+
 
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<AllowedPlacesTypeResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<AllowedPlacesResponse> call, @NonNull Throwable t) {
                 Log.d(TAG, Objects.requireNonNull(t.getMessage()));
             }
         });
     }
 
-    public LiveData<List<AllowedPlacesType>> getAllAllowedPlaces() {
-        return database.getAllowedPlacesTypeDAO().getAll();
+    public LiveData<List<AllowedPlaces>> getAllAllowedPlaces() {
+        return database.getAllowedPlacesDAO().getAll();
     }
 
 
-    private void insertAllowedPlace(LiveData<AllowedPlacesType> allowedPlace) {
-        AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesTypeDAO().insert(allowedPlace.getValue()));
+    private void insertAllowedPlace(LiveData<AllowedPlaces> allowedPlace) {
+        AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesDAO().insert(allowedPlace.getValue()));
+    }
+
+    private AllowedPlaces processResponseItem (AllowedPlacesResponseItem allowedPlacesResponseItem){
+        AllowedPlaces allowedPlaces = new AllowedPlaces();
+
+        allowedPlaces.setId(allowedPlacesResponseItem.getId());
+        allowedPlaces.setName(allowedPlacesResponseItem.getTitle());
+        allowedPlaces.setTypes(allowedPlacesResponseItem.getCategory().getId());
+        allowedPlaces.setGeo_lat(allowedPlacesResponseItem.getPosition().get(0));
+        allowedPlaces.setGeo_long(allowedPlacesResponseItem.getPosition().get(1));
+        allowedPlaces.setIcon(allowedPlacesResponseItem.getIcon());
+
+        return allowedPlaces;
     }
 
 }

@@ -1,186 +1,123 @@
-package com.example.mqtt.model;
+package com.example.mqtt.data.remote;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
-import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.example.mqtt.model.AllowedPlaces;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Objects;
 
-@Entity
-public class AllowedPlaces {
+public class AllowedPlacesResponseItem {
 
-    @SerializedName("id")
-    @Expose
-    @PrimaryKey
-    @ColumnInfo(name = "id")
-    private int id;
+    private ArrayList<Double> position;
 
-    @SerializedName("name")
-    @Expose
-    @ColumnInfo(name = "name")
-    private String name;
+    private String id;
 
-    @SerializedName("geometry")
-    @Expose
-    private Geometry geometry;
+    private String title;
 
-    @SerializedName("types")
-    @Expose
-    @ColumnInfo(name = "type") // TODO ask if it is better to have a foreign key
-    private ArrayList<String> type;
+    private Category category;
 
-    public AllowedPlaces(int id, String name, Geometry geometry, ArrayList<String> type) {
+    private String icon;
+
+    public AllowedPlacesResponseItem(ArrayList<Double> position, String id, String title, Category category, String icon) {
+        this.position = position;
         this.id = id;
-        this.name = name;
-        this.geometry = geometry;
-        this.type = type;
+        this.title = title;
+        this.category = category;
+        this.icon = icon;
     }
 
-    public int getId() {
+    public ArrayList<Double> getPosition() {
+        return position;
+    }
+
+    public void setPosition(ArrayList<Double> position) {
+        this.position = position;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Geometry getGeometry() {
-        return geometry;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public ArrayList<String> getType() {
-        return type;
+    public String getIcon() {
+        return icon;
     }
 
-    public void setType(ArrayList<String> type) {
-        this.type = type;
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     @NonNull
     @Override
     public String toString() {
-        String types = "[";
-        for (String typeItem : type)
-            types+=typeItem + " ,";
-        types.substring(0, types.length()-2);
-        types+="]";
-
-        return "News item {" +
-                " id = " + id +
-                " , name = '" + name + '\'' +
-                " , geometry = " + geometry.toString() +
-                " , types = " + types +
+        return "AllowedPlacesResponseItem{" +
+                "position=" + position +
+                ", id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", category=" + category +
+                ", icon=" + icon +
                 '}';
     }
 
-    @Override
-    public boolean equals(Object p1){
-        if (!p1.getClass().isInstance(AllowedPlaces.class)) {
-            return false;
-        } else {
-            if (p1 instanceof AllowedPlaces){
-                return ((AllowedPlaces) p1).getId() == (this.id) &&
-                        ((AllowedPlaces) p1).getName().equals(this.name) &&
-                        ((AllowedPlaces) p1).getGeometry().equals(this.geometry) &&
-                        ((AllowedPlaces) p1).getType().equals(this.type);
-            }
-        }
-        return false;
-    }
+    public class Category { //TODO to retreive all the possible types https://places.demo.api.here.com/places/v1/categories/places/?app_id=DemoAppId01082013GAL&app_code=AJKnXv84fjrb0KIHawS0Tg#
 
-    private class Geometry {
+        private String id;
 
-        @SerializedName("location")
-        @Expose
-        private Location location;
+        private String title;
 
-        private class Location {
-            @SerializedName("lat")
-            @Expose
-            @ColumnInfo(name = "geoLat")
-            private double geoLat;
-
-            @SerializedName("lng")
-            @Expose
-            @ColumnInfo(name = "geoLong")
-            private double geoLong;
-
-            public double getGeoLat() {
-                return geoLat;
-            }
-
-            public void setGeoLat(double geoLat) {
-                this.geoLat = geoLat;
-            }
-
-            public double getGeoLong() {
-                return geoLong;
-            }
-
-            public void setGeoLong(double geoLong) {
-                this.geoLong = geoLong;
-            }
-
-            @Override
-            public String toString() {
-                return "Location{" +
-                        "geoLat=" + geoLat +
-                        ", geoLong=" + geoLong +
-                        '}';
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                Location location = (Location) o;
-                return Double.compare(location.geoLat, geoLat) == 0 &&
-                        Double.compare(location.geoLong, geoLong) == 0;
-            }
-
+        public Category(String id, String title) {
+            this.id = id;
+            this.title = title;
         }
 
-        public Location getLocation() {
-            return location;
+        public String getId() {
+            return id;
         }
 
-        public void setLocation(Location location) {
-            this.location = location;
+        public void setId(String id) {
+            this.id = id;
         }
 
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        @NonNull
         @Override
         public String toString() {
-            return "Geometry{" +
-                    "location=" + location.toString() +
+            return "Category{" +
+                    "id='" + id + '\'' +
+                    ", title='" + title + '\'' +
                     '}';
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Geometry geometry = (Geometry) o;
-            return Objects.equals(location, geometry.location);
-        }
-
     }
-
 
 }

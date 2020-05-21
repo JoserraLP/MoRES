@@ -129,9 +129,6 @@ public class ForegroundService extends Service {
         mServiceHandler = new Handler(handlerThread.getLooper());
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        //mqttClient = MQTTClient.getInstance(this);
-        //mqttClient.startConnection();
-
         // Register the receiver
         receiver = new Receiver(getApplication());
 

@@ -44,10 +44,10 @@ public class AllowedPlacesTypeRepository {
         database = AppDatabase.getDatabase(application);
     }
 
-    public void loadAllAllowedPlaces() {
-        Call<AllowedPlacesTypeResponse> allowedPlacesResponseCall = retrofit.getAllowedPlacesTypeServiceAPI().getAllowedPlacesType();
+    public void loadAllAllowedPlacesTypes() {
+        Call<AllowedPlacesTypeResponse> allowedPlacesTypeResponseCall = retrofit.getAllowedPlacesTypeServiceAPI().getAllowedPlacesType();
 
-        allowedPlacesResponseCall.enqueue(new Callback<AllowedPlacesTypeResponse>() {
+        allowedPlacesTypeResponseCall.enqueue(new Callback<AllowedPlacesTypeResponse>() {
             @Override
             public void onResponse(@NonNull Call<AllowedPlacesTypeResponse> call, @NonNull Response<AllowedPlacesTypeResponse> response) {
                 if (response.isSuccessful()) {
@@ -55,8 +55,8 @@ public class AllowedPlacesTypeRepository {
                     assert allowedPlacesTypeResponse != null;
                     ArrayList<AllowedPlacesType> listAllowedPlacesTypes = allowedPlacesTypeResponse.getResults();
                     allAllowedPlacesType.setValue(listAllowedPlacesTypes);
-                    for (AllowedPlacesType place : listAllowedPlacesTypes)
-                        insertAllowedPlace(new MutableLiveData<>(place));
+                    for (AllowedPlacesType placeType : listAllowedPlacesTypes)
+                        insertAllowedPlaceType(new MutableLiveData<>(placeType));
 
                 }
             }
@@ -68,13 +68,13 @@ public class AllowedPlacesTypeRepository {
         });
     }
 
-    public LiveData<List<AllowedPlacesType>> getAllAllowedPlaces() {
+    public LiveData<List<AllowedPlacesType>> getAllAllowedPlacesTypes() {
         return database.getAllowedPlacesTypeDAO().getAll();
     }
 
 
-    private void insertAllowedPlace(LiveData<AllowedPlacesType> allowedPlace) {
-        AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesTypeDAO().insert(allowedPlace.getValue()));
+    private void insertAllowedPlaceType(LiveData<AllowedPlacesType> allowedPlaceType) {
+        AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesTypeDAO().insert(allowedPlaceType.getValue()));
     }
 
 }

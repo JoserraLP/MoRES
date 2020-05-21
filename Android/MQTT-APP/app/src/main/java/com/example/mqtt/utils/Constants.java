@@ -6,4 +6,13 @@ public class Constants {
 
     public static String API_SERVER_URL = "http://192.168.1.83:8080/";
 
+    public static String PLACES_API_SERVER_URL = "https://places.demo.api.here.com/places/v1/discover/";
+
+    public static String PLACES_API_ID = "DemoAppId01082013GAL";
+
+    public static String PLACES_API_CODE = "AJKnXv84fjrb0KIHawS0Tg";
+
+    public static int SIZE_PLACES_API_REQUEST = 20;
+
+
 }

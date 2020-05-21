@@ -5,8 +5,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,23 +22,22 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.mqtt.R;
+import com.example.mqtt.model.AllowedPlaces;
 import com.example.mqtt.model.AllowedPlacesType;
 import com.example.mqtt.service.ForegroundService;
 import com.example.mqtt.ui.home.viewmodel.AllowedPlacesTypeViewModel;
+import com.example.mqtt.ui.home.viewmodel.AllowedPlacesViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
@@ -47,69 +50,40 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
     private Location curLocation;
 
-    private ArrayList<Place> nearbyPlaces;
+    private Location lastNearbyLocation;
 
-    private Marker prevMarker;
-
-    private Float zoom = 15.0f;
-
-    private PlacesClient placesClient;
-
-    private List<Place.Field> placeFields;
+    private Float zoom = 18.0f;
 
     private ArrayList<AllowedPlacesType> allowedPlacesTypes;
+
+    private AllowedPlacesViewModel allowedPlacesViewModel;
+
+    private ArrayList<AllowedPlaces> allowedPlaces;
+
+    private ArrayList<Marker> allMarkers;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         // Inflate the map fragment
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        if (savedInstanceState != null) {
-            //Restore the fragment's state here
-
-            nearbyPlaces = savedInstanceState.getParcelableArrayList("nearbyPlaces");
-            curLocation = savedInstanceState.getParcelable("curLocation");
-
-            for (Place place : nearbyPlaces)
-                map.addMarker(new MarkerOptions().position(Objects.requireNonNull(place.getLatLng())).title(place.getName()));
-            if (curLocation != null) {
-                map.setMyLocationEnabled(true);
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()), zoom));
-            }
-        }
-
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         if (mapFragment != null)
             mapFragment.getMapAsync(this);
 
-        // Initialize the location receiver
         locationReceiver = new LocationReceiver();
 
-        // Initialize the SDK
-        Places.initialize(requireContext(), getString(R.string.google_maps_key));
-
-        // Create a new Places client instance
-        placesClient = Places.createClient(requireContext());
-
-        placeFields = new ArrayList<>();
-        placeFields.add(Place.Field.NAME);
-        placeFields.add(Place.Field.LAT_LNG);
-        placeFields.add(Place.Field.TYPES);
-
-        // Use fields to define the data types to return.
-        // placeFields = Collections.singletonList(Place.Field.NAME);
+        allowedPlacesTypes = new ArrayList<>();
+        allowedPlaces = new ArrayList<>();
+        allMarkers = new ArrayList<>();
 
         @SuppressWarnings("deprecation")
         AllowedPlacesTypeViewModel allowedPlacesTypeViewModel = ViewModelProviders.of(requireActivity()).get(AllowedPlacesTypeViewModel.class);
 
-        allowedPlacesTypes = new ArrayList<>();
+        //noinspection deprecation
+        allowedPlacesViewModel = ViewModelProviders.of(requireActivity()).get(AllowedPlacesViewModel.class);
 
-        allowedPlacesTypeViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlacesTypes.addAll(allAllowedPlaces));
-
-        if (curLocation != null) {
-            map.setMyLocationEnabled(true);
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()), zoom));
-        }
+        allowedPlacesTypeViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlacesType -> allowedPlacesTypes.addAll(allAllowedPlacesType));
 
         return root;
     }
@@ -137,26 +111,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         if (mapFragment != null)
             mapFragment.getMapAsync(this);
 
-        if (curLocation != null) {
-            map.setMyLocationEnabled(true);
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()), zoom));
-        }
-
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Save the map instance
         map = googleMap;
-    }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        //Save the fragment's state here
-        outState.putParcelable("curLocation", curLocation);
-        outState.putParcelableArrayList("nearbyPlaces", nearbyPlaces);
+        if (curLocation != null) {
+            map.setMyLocationEnabled(true);
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()), zoom));
+        }
     }
 
     /**
@@ -169,90 +134,122 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             Location location = intent.getParcelableExtra(ForegroundService.EXTRA_LOCATION);
             if (location != null) {
                 if (curLocation != null) {
-                    if (curLocation.getLatitude() != location.getLatitude() && curLocation.getLongitude() != location.getLongitude())
+                    if (curLocation.getLatitude() != location.getLatitude() && curLocation.getLongitude() != location.getLongitude()) {
                         curLocation = location;
+                        if (lastNearbyLocation != null) {
+                            if (curLocation.distanceTo(lastNearbyLocation) > 200) { // TODO load near places. Do this with the location from the first time for example.
+                                lastNearbyLocation = curLocation;
+                                Log.d(TAG, "New nearby places - by last near location");
+
+                                map.clear();
+
+                                allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
+
+                                for (AllowedPlaces place : allowedPlaces) {
+                                    Location placeLocation = new Location("");
+                                    placeLocation.setLatitude(place.getGeo_lat());
+                                    placeLocation.setLongitude(place.getGeo_long());
+                                    if (curLocation.distanceTo(placeLocation) < 200) {
+                                        ArrayList <Object> taskParameters = new ArrayList<>();
+                                        taskParameters.add(place.getIcon());
+                                        taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
+                                        taskParameters.add(place.getName());
+                                        //noinspection unchecked
+                                        new IconLoaderTask().execute(taskParameters);
+
+                                    }
+                                }
+                            }
+
+                        } else {
+                            lastNearbyLocation = curLocation;
+
+                            map.clear();
+
+                            allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces)); // TODO check if pattern repository is right
+
+                            for (AllowedPlaces place : allowedPlaces) {
+                                Log.d(TAG, "New nearby places");
+                                Location placeLocation = new Location("");
+                                location.setLatitude(place.getGeo_lat());
+                                location.setLongitude(place.getGeo_long());
+                                if (curLocation.distanceTo(placeLocation) < 200) {
+                                    Log.d(TAG, place.toString());
+                                    ArrayList <Object> taskParameters = new ArrayList<>();
+                                    taskParameters.add(place.getIcon());
+                                    taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
+                                    taskParameters.add(place.getName());
+                                    //noinspection unchecked
+                                    new IconLoaderTask().execute(taskParameters);
+                                }
+                            }
+                        }
+                    }
                     else
                         return;
                 } else
                     curLocation = location;
 
                 map.setMyLocationEnabled(true);
-
-                /* TODO This is commented because i dont know if the findCurrentPlace costs.
-                // TODO This works but make it efficiently with location radius
-                // Use the builder to create a FindCurrentPlaceRequest.
-                FindCurrentPlaceRequest request =
-                        FindCurrentPlaceRequest.newInstance(placeFields);
-
-
-                // TODO Call findCurrentPlace and handle the response (first check that the user has granted permission).
-                Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request); // TODO ver si esto hace que se cobre
-                placeResponse.addOnCompleteListener(task -> {
-                    if (task.isSuccessful()){
-                        FindCurrentPlaceResponse response = task.getResult();
-                        if (response != null) {
-                            for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                                Log.i(TAG, String.format("Place '%s' has likelihood: %f",
-                                        placeLikelihood.getPlace().getName(),
-                                        placeLikelihood.getLikelihood()));
-
-                                // TODO Check types
-                                // https://developers.google.com/places/android-sdk/reference/com/google/android/libraries/places/api/model/Place.Type
-
-                                for (Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
-                                    for (AllowedPlacesType allowedPlacesType : allowedPlaces) {
-                                        if (allowedPlacesType.getType().equals(type.toString().toLowerCase()))
-                                            map.addMarker(new MarkerOptions().position(Objects.requireNonNull(placeLikelihood.getPlace().getLatLng())).title(placeLikelihood.getPlace().getName()));
-                                    }
-
-                                }
-
-                            }
-                        }
-                    } else {
-                        Exception exception = task.getException();
-                        if (exception instanceof ApiException) {
-                            ApiException apiException = (ApiException) exception;
-                            Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-                        }
-                    }
-                });
-
-
-                 */
-
-                //TODO this is done with the Places API
-                /* Now i dont have more request per day
-                // Instantiate the RequestQueue.
-                RequestQueue queue = Volley.newRequestQueue(getContext());
-                String url ="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + curLocation.getLatitude() + "," + curLocation.getLongitude() + "&radius=1500&key=AIzaSyDlR3UBqr8GuUTJuYsS3bJ6xozqc4jfnhw";
-                Log.d(TAG, url);
-
-                // Request a string response from the provided URL.
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                // Display the first 500 characters of the response string.
-                                try {
-                                    JSONObject jsonObject = new JSONObject(response);
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, "That didn't work!");
-                    }
-                });
-
-                // Add the request to the RequestQueue.
-                queue.add(stringRequest);
-
-                 */
             }
+        }
+    }
+
+    /*
+    public void removeFarMarkers(){
+        for (Marker marker : allMarkers){
+            Location markerLoc = new Location("");
+            markerLoc.setLatitude(marker.getPosition().latitude);
+            markerLoc.setLongitude(marker.getPosition().longitude);
+            if (markerLoc.distanceTo(curLocation) > 400) {
+                Log.d(TAG, "Removing marker " + marker.getTitle());
+                marker.remove();
+                allMarkers.remove(marker);
+            }
+        }
+    }
+    */
+
+
+    @SuppressLint("StaticFieldLeak")
+    class IconLoaderTask extends AsyncTask <ArrayList<Object>, String, Bitmap>
+    {
+        private LatLng position;
+        private String title;
+
+        @SafeVarargs
+        @Override
+        protected final Bitmap doInBackground(ArrayList<Object>... arrayLists) {
+            URL url ;
+            Bitmap bmp = null;
+            try {
+                url = new URL(arrayLists[0].get(0).toString());
+                position = (LatLng) arrayLists[0].get(1);
+                title = arrayLists[0].get(2).toString();
+                bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return bmp;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            // TODO Auto-generated method stub
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+
+            super.onPostExecute(result);
+            Marker marker = map.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title(title)
+                    .icon(BitmapDescriptorFactory.fromBitmap(result)));
+
+            allMarkers.add(marker);
         }
     }
 }

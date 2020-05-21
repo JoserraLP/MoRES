@@ -2,20 +2,19 @@
 
 package com.example.mqtt.data.remote;
 
-import com.example.mqtt.model.DeviceID;
 import com.example.mqtt.utils.Constants;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitClient {
+public class PlacesRetrofitClient {
 
-    private static final String BASE_URL = Constants.API_SERVER_URL; // Localhost fails http://localhost:8080/
+    private static final String BASE_URL = Constants.PLACES_API_SERVER_URL;
 
-    private static RetrofitClient mInstance;
+    private static PlacesRetrofitClient mInstance;
     private Retrofit retrofit;
 
-    private RetrofitClient(){
+    private PlacesRetrofitClient(){
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -23,19 +22,15 @@ public class RetrofitClient {
                 .build();
     }
 
-    public static synchronized RetrofitClient getInstance(){
+    public static synchronized PlacesRetrofitClient getInstance(){
         if(mInstance == null){
-            mInstance = new RetrofitClient();
+            mInstance = new PlacesRetrofitClient();
         }
         return mInstance;
     }
 
-    public AllowedPlacesTypeService getAllowedPlacesTypeServiceAPI(){
-        return retrofit.create(AllowedPlacesTypeService.class);
-    }
-
-    public DeviceIDService getDeviceIDAPI(){
-        return retrofit.create(DeviceIDService.class);
+    public AllowedPlacesService getAllowedPlacesServiceAPI(){
+        return retrofit.create(AllowedPlacesService.class);
     }
 
 }

@@ -68,7 +68,7 @@ public class DrawerActivity extends AppCompatActivity {
         NavigationView navigationView = findViewById(R.id.nav_view);
 
         // Load all the allowed places
-        AllowedPlacesTypeRepository.getInstance(getApplication()).loadAllAllowedPlaces();
+        AllowedPlacesTypeRepository.getInstance(getApplication()).loadAllAllowedPlacesTypes();
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.

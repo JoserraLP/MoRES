@@ -8,6 +8,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.example.mqtt.model.AllowedPlaces;
 import com.example.mqtt.model.AllowedPlacesType;
 import com.example.mqtt.model.DeviceID;
 import com.example.mqtt.model.News;
@@ -15,7 +16,7 @@ import com.example.mqtt.model.News;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {News.class, AllowedPlacesType.class, DeviceID.class}, version = 1, exportSchema = false)
+@Database(entities = {News.class, AllowedPlacesType.class, AllowedPlaces.class, DeviceID.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
@@ -64,5 +65,10 @@ public abstract class AppDatabase extends RoomDatabase {
 
     abstract DeviceIDDAO deviceIDDAO();
 
+    public AllowedPlacesDAO getAllowedPlacesDAO (){
+        return this.allowedPlacesDAO();
+    }
+
+    abstract AllowedPlacesDAO allowedPlacesDAO();
 
 }

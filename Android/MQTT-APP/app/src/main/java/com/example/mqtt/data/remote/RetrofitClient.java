@@ -2,7 +2,6 @@
 
 package com.example.mqtt.data.remote;
 
-import com.example.mqtt.model.DeviceID;
 import com.example.mqtt.utils.Constants;
 
 import retrofit2.Retrofit;

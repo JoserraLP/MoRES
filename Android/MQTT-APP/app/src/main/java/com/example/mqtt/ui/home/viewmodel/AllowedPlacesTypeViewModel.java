@@ -19,7 +19,7 @@ public class AllowedPlacesTypeViewModel extends AndroidViewModel {
     public AllowedPlacesTypeViewModel(Application application) {
         super(application);
         mRepository = AllowedPlacesTypeRepository.getInstance(application);
-        mAllAllowedPlaces = mRepository.getAllAllowedPlaces();
+        mAllAllowedPlaces = mRepository.getAllAllowedPlacesTypes();
     }
 
     public LiveData<List<AllowedPlacesType>> getAllAllowedPlaces() {
