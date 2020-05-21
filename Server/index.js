@@ -25,11 +25,6 @@ mongoClient.connect(mongoURL, function(err, db) {
     });
     dbase.collection("device").createIndex({"createdAt" : 1}, {expireAfterSeconds: 86400}); // 24 hours to delete the document
 
-    dbase.createCollection("allowed_places", function(err, res){
-        if (err) throw err;
-    });
-    dbase.collection("allowed_places").createIndex({"location" : "2dsphere"});
-
 }); 
 
 
@@ -39,7 +34,7 @@ var client = mqtt.connect("mqtt://192.168.1.83");
 
 client.on("connect", function(){
     console.log("Connected to MQTT Broker");
-})
+});
 
 client.on("error",function(error){
     console.log("Can't connect" + error);
@@ -91,54 +86,6 @@ var options_object = {
     router: true,
     validator: true
 };
-
-var lat = 38.8779
-var lng = -6.9680
-var radius = 100000
-var key = 'AIzaSyDlR3UBqr8GuUTJuYsS3bJ6xozqc4jfnhw'
-
-// Function to load the allowed places from a place, for example, Extremadura
-https.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + str(lat) + ',' + str(lng) + '&radius=' + str(radius) + '&key=' + key, (resp) => {
-  let data = '';
-
-  // A chunk of data has been recieved.
-  resp.on('data', (chunk) => {
-    data += chunk;
-  });
-
-  // The whole response has been received. Print out the result.
-  resp.on('end', () => {
-    console.log(JSON.parse(data));
-    
-    // Save the data in mongo
-    mongoClient.connect(mongoURL, function(err, db) {
-        if (err) throw err;
-        var dbase = db.db("tfg");
-
-        var results = JSON.parse(date)['results'];
-
-        results.forEach(function(value) {
-            data = {
-                id : value.id,
-                location: { 
-                    type: "Point", 
-                    coordinates: [ value.geometry.location.lat, value.geometry.location.lng ] 
-                },
-                name : value.name,
-                types : value.types
-            }
-            dbase.collection("allowed_places").insertOne(data, function(err, res) { // TODO make this more efficient with insertMany
-                if (err) throw err;
-                console.log("Inserted allowed place with name: " + value.name)
-            }); 
-        });
-
-    }); 
-  });
-
-}).on("error", (err) => {
-  console.log("Error: " + err.message);
-});
 
 oasTools.configure(options_object);
 
