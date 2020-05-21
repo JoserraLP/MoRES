@@ -17,7 +17,8 @@ public class AllowedPlaces {
     @Expose
     @PrimaryKey
     @ColumnInfo(name = "id")
-    private String id;
+    @NonNull
+    private String id = "";
 
     @SerializedName("name")
     @Expose
@@ -47,7 +48,7 @@ public class AllowedPlaces {
     public AllowedPlaces() {
     }
 
-    public AllowedPlaces(String id, String name, String types, double geo_lat, double geo_long, String icon) {
+    public AllowedPlaces(@NonNull String id, String name, String types, double geo_lat, double geo_long, String icon) {
         this.id = id;
         this.name = name;
         this.types = types;
@@ -56,11 +57,12 @@ public class AllowedPlaces {
         this.icon = icon;
     }
 
+    @NonNull
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(@NonNull String id) {
         this.id = id;
     }
 
