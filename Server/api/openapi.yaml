@@ -246,6 +246,64 @@ paths:
       tags:
       - DeviceID
       x-swagger-router-controller: DeviceID
+  /nearby_devices:
+    get:
+      description: Return the  position of the nearby devices
+      operationId: getNearbyDevices
+      parameters:
+      - description: device latitude 
+        explode: true
+        in: query
+        name: lat
+        required: true
+        schema:
+          type: number
+        style: form
+      - description: device longitude
+        explode: true
+        in: query
+        name: lng
+        required: true
+        schema:
+          type: number
+        style: form
+      - description: radius
+        explode: true
+        in: query
+        name: rad
+        required: true
+        schema:
+          type: number
+        style: form
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Created
+                title: Created
+                type: string
+          description: Created
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+      summary: Return the nearby devices
+      tags:
+      - NearbyDevices
+      x-swagger-router-controller: NearbyDevices
 components:
   responses:
     201:

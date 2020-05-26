@@ -23,7 +23,8 @@ mongoClient.connect(mongoURL, function(err, db) {
     dbase.createCollection("device", function(err, res){
         if (err) throw err;
     });
-    dbase.collection("device").createIndex({"createdAt" : 1}, {expireAfterSeconds: 86400}); // 24 hours to delete the document
+    dbase.collection("device").createIndex({"location" : "2dsphere"});
+    //dbase.collection("device").createIndex({"createdAt" : 1}, {expireAfterSeconds: 86400}); // 24 hours to delete the document
 
 }); 
 
