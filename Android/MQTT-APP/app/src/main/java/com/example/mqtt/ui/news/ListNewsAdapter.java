@@ -91,7 +91,7 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
             super(itemView);
 
             newsImageView = itemView.findViewById(R.id.news_image);
-            newsTitle = itemView.findViewById(R.id.news_title);
+            newsTitle = itemView.findViewById(R.id.allowed_places_type_value);
         }
     }
 

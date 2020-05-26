@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import com.example.mqtt.data.repository.AllowedPlacesRepository;
 import com.example.mqtt.model.AllowedPlaces;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AllowedPlacesViewModel extends AndroidViewModel {
@@ -24,5 +25,9 @@ public class AllowedPlacesViewModel extends AndroidViewModel {
 
     public LiveData<List<AllowedPlaces>> getAllAllowedPlaces() {
         return mAllAllowedPlaces;
+    }
+
+    public LiveData<List<AllowedPlaces>> getAllAllowedPlacesByTypes(List<String> types) {
+        return mRepository.getAllAllowedPlacesByTypes(types);
     }
 }

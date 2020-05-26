@@ -32,4 +32,7 @@
     <string name="date_title">Date:</string>
     <string name="author_title">Author:</string>
     <string name="launch_activity">Open application</string>
+    <string name="menu_filter">Filter</string>
+    <string name="allowed_places_type_title">Allowed Places Type</string>
+    <string name="filter_layout_title">Select places types to show</string>
 </resources>

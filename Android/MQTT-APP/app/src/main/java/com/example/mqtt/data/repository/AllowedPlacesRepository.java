@@ -77,6 +77,9 @@ public class AllowedPlacesRepository {
         return database.getAllowedPlacesDAO().getAll();
     }
 
+    public LiveData<List<AllowedPlaces>> getAllAllowedPlacesByTypes(List<String> types) {
+        return database.getAllowedPlacesDAO().getAllByTypes(types);
+    }
 
     private void insertAllowedPlace(LiveData<AllowedPlaces> allowedPlace) {
         AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesDAO().insert(allowedPlace.getValue()));

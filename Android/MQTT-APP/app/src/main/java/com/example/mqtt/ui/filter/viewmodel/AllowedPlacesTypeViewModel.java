@@ -1,9 +1,10 @@
-package com.example.mqtt.ui.home.viewmodel;
+package com.example.mqtt.ui.filter.viewmodel;
 
 import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.mqtt.data.repository.AllowedPlacesTypeRepository;
 import com.example.mqtt.model.AllowedPlacesType;
@@ -14,15 +15,19 @@ public class AllowedPlacesTypeViewModel extends AndroidViewModel {
 
     private AllowedPlacesTypeRepository mRepository;
 
-    private LiveData<List<AllowedPlacesType>> mAllAllowedPlaces;
+    private LiveData<List<AllowedPlacesType>> mAllAllowedPlacesType;
 
     public AllowedPlacesTypeViewModel(Application application) {
         super(application);
         mRepository = AllowedPlacesTypeRepository.getInstance(application);
-        mAllAllowedPlaces = mRepository.getAllAllowedPlacesTypes();
+        mAllAllowedPlacesType = mRepository.getAllAllowedPlacesTypes();
     }
 
-    public LiveData<List<AllowedPlacesType>> getAllAllowedPlaces() {
-        return mAllAllowedPlaces;
+    public LiveData<List<AllowedPlacesType>> getAllAllowedPlacesType() {
+        return mAllAllowedPlacesType;
+    }
+
+    public void updateAllowedPlacesTypeChecked(AllowedPlacesType allowedPlacesType){
+        mRepository.updateAllowedPlaceType(new MutableLiveData<>(allowedPlacesType));
     }
 }

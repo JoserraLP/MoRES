@@ -77,4 +77,8 @@ public class AllowedPlacesTypeRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesTypeDAO().insert(allowedPlaceType.getValue()));
     }
 
+    public void updateAllowedPlaceType(LiveData<AllowedPlacesType> allowedPlaceType){
+        AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesTypeDAO().update(allowedPlaceType.getValue()));
+    }
+
 }

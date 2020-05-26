@@ -17,6 +17,10 @@
         <action
             android:id="@+id/action_nav_home_to_nav_settings"
             app:destination="@id/nav_settings" />
+
+        <action
+            android:id="@+id/action_nav_home_to_nav_filter"
+            app:destination="@id/nav_filter" />
     </fragment>
 
 
@@ -24,7 +28,7 @@
         android:id="@+id/nav_news"
         android:name="com.example.mqtt.ui.news.view.NewsFragment"
         android:label="@string/menu_news"
-        tools:layout="@layout/fragment_news_info" >
+        tools:layout="@layout/fragment_news" >
         <action
             android:id="@+id/action_nav_news_to_nav_news_item"
             app:destination="@id/nav_news_item" />
@@ -34,7 +38,7 @@
         android:id="@+id/nav_news_item"
         android:name="com.example.mqtt.ui.news.view.NewsItemFragment"
         android:label="@string/menu_news"
-        tools:layout="@layout/fragment_slideshow" >
+        tools:layout="@layout/fragment_news_info" >
     </fragment>
 
     <fragment
@@ -42,4 +46,10 @@
         android:name="com.example.mqtt.ui.settings.SlideshowFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_filter"
+        android:name="com.example.mqtt.ui.filter.view.FilterFragment"
+        android:label="@string/menu_filter"
+        tools:layout="@layout/fragment_filter" />
 </navigation>

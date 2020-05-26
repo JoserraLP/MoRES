@@ -25,7 +25,7 @@ import com.example.mqtt.R;
 import com.example.mqtt.model.AllowedPlaces;
 import com.example.mqtt.model.AllowedPlacesType;
 import com.example.mqtt.service.ForegroundService;
-import com.example.mqtt.ui.home.viewmodel.AllowedPlacesTypeViewModel;
+import com.example.mqtt.ui.filter.viewmodel.AllowedPlacesTypeViewModel;
 import com.example.mqtt.ui.home.viewmodel.AllowedPlacesViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
@@ -55,6 +56,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private Float zoom = 18.0f;
 
     private ArrayList<AllowedPlacesType> allowedPlacesTypes;
+
+    private List<String> allowedTypes;
 
     private AllowedPlacesViewModel allowedPlacesViewModel;
 
@@ -83,7 +86,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         //noinspection deprecation
         allowedPlacesViewModel = ViewModelProviders.of(requireActivity()).get(AllowedPlacesViewModel.class);
 
-        allowedPlacesTypeViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlacesType -> allowedPlacesTypes.addAll(allAllowedPlacesType));
+        allowedPlacesTypeViewModel.getAllAllowedPlacesType().observe(requireActivity(), allAllowedPlacesType -> allowedPlacesTypes.addAll(allAllowedPlacesType));
 
         return root;
     }
@@ -110,6 +113,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         if (mapFragment != null)
             mapFragment.getMapAsync(this);
+
+        allowedTypes = new ArrayList<>();
+
+        for (AllowedPlacesType allowedPlacesType : allowedPlacesTypes){
+            if (allowedPlacesType.isChecked())
+                allowedTypes.add(allowedPlacesType.getType());
+        }
 
     }
 
@@ -143,20 +153,23 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
                                 map.clear();
 
-                                allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
+                                if (getActivity() != null) {
+                                    allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
+                                    // allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
 
-                                for (AllowedPlaces place : allowedPlaces) {
-                                    Location placeLocation = new Location("");
-                                    placeLocation.setLatitude(place.getGeo_lat());
-                                    placeLocation.setLongitude(place.getGeo_long());
-                                    if (curLocation.distanceTo(placeLocation) < 200) {
-                                        ArrayList <Object> taskParameters = new ArrayList<>();
-                                        taskParameters.add(place.getIcon());
-                                        taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
-                                        taskParameters.add(place.getName());
-                                        //noinspection unchecked
-                                        new IconLoaderTask().execute(taskParameters);
+                                    for (AllowedPlaces place : allowedPlaces) {
+                                        Location placeLocation = new Location("");
+                                        placeLocation.setLatitude(place.getGeo_lat());
+                                        placeLocation.setLongitude(place.getGeo_long());
+                                        if (curLocation.distanceTo(placeLocation) < 200) {
+                                            ArrayList<Object> taskParameters = new ArrayList<>();
+                                            taskParameters.add(place.getIcon());
+                                            taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
+                                            taskParameters.add(place.getName());
+                                            //noinspection unchecked
+                                            new IconLoaderTask().execute(taskParameters);
 
+                                        }
                                     }
                                 }
                             }
@@ -165,22 +178,25 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                             lastNearbyLocation = curLocation;
 
                             map.clear();
+                            if (getActivity() != null) {
+                                allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
 
-                            allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces)); // TODO check if pattern repository is right
+                                //allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces)); // TODO check if pattern repository is right
 
-                            for (AllowedPlaces place : allowedPlaces) {
-                                Log.d(TAG, "New nearby places");
-                                Location placeLocation = new Location("");
-                                location.setLatitude(place.getGeo_lat());
-                                location.setLongitude(place.getGeo_long());
-                                if (curLocation.distanceTo(placeLocation) < 200) {
-                                    Log.d(TAG, place.toString());
-                                    ArrayList <Object> taskParameters = new ArrayList<>();
-                                    taskParameters.add(place.getIcon());
-                                    taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
-                                    taskParameters.add(place.getName());
-                                    //noinspection unchecked
-                                    new IconLoaderTask().execute(taskParameters);
+                                for (AllowedPlaces place : allowedPlaces) {
+                                    Log.d(TAG, "New nearby places");
+                                    Location placeLocation = new Location("");
+                                    location.setLatitude(place.getGeo_lat());
+                                    location.setLongitude(place.getGeo_long());
+                                    if (curLocation.distanceTo(placeLocation) < 200) {
+                                        Log.d(TAG, place.toString());
+                                        ArrayList<Object> taskParameters = new ArrayList<>();
+                                        taskParameters.add(place.getIcon());
+                                        taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
+                                        taskParameters.add(place.getName());
+                                        //noinspection unchecked
+                                        new IconLoaderTask().execute(taskParameters);
+                                    }
                                 }
                             }
                         }
@@ -194,21 +210,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
-
-    /*
-    public void removeFarMarkers(){
-        for (Marker marker : allMarkers){
-            Location markerLoc = new Location("");
-            markerLoc.setLatitude(marker.getPosition().latitude);
-            markerLoc.setLongitude(marker.getPosition().longitude);
-            if (markerLoc.distanceTo(curLocation) > 400) {
-                Log.d(TAG, "Removing marker " + marker.getTitle());
-                marker.remove();
-                allMarkers.remove(marker);
-            }
-        }
-    }
-    */
 
 
     @SuppressLint("StaticFieldLeak")
