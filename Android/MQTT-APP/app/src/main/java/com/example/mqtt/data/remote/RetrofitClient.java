@@ -37,4 +37,7 @@ public class RetrofitClient {
         return retrofit.create(DeviceIDService.class);
     }
 
+    public NearbyDevicesService getNearbyDevicesServiceAPI(){
+        return retrofit.create(NearbyDevicesService.class);
+    }
 }

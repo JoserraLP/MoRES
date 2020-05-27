@@ -24,9 +24,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.example.mqtt.R;
 import com.example.mqtt.model.AllowedPlaces;
 import com.example.mqtt.model.AllowedPlacesType;
+import com.example.mqtt.model.NearbyDevice;
 import com.example.mqtt.service.ForegroundService;
 import com.example.mqtt.ui.filter.viewmodel.AllowedPlacesTypeViewModel;
 import com.example.mqtt.ui.home.viewmodel.AllowedPlacesViewModel;
+import com.example.mqtt.ui.home.viewmodel.NearbyDevicesViewModel;
+import com.example.mqtt.utils.Constants;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,6 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
@@ -61,9 +65,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
     private AllowedPlacesViewModel allowedPlacesViewModel;
 
+    private NearbyDevicesViewModel nearbyDevicesViewModel;
+
     private ArrayList<AllowedPlaces> allowedPlaces;
 
-    private ArrayList<Marker> allMarkers;
+    private ArrayList<NearbyDevice> nearbyDevices;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +84,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         allowedPlacesTypes = new ArrayList<>();
         allowedPlaces = new ArrayList<>();
-        allMarkers = new ArrayList<>();
+        nearbyDevices = new ArrayList<>();
 
         @SuppressWarnings("deprecation")
         AllowedPlacesTypeViewModel allowedPlacesTypeViewModel = ViewModelProviders.of(requireActivity()).get(AllowedPlacesTypeViewModel.class);
@@ -87,6 +93,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         allowedPlacesViewModel = ViewModelProviders.of(requireActivity()).get(AllowedPlacesViewModel.class);
 
         allowedPlacesTypeViewModel.getAllAllowedPlacesType().observe(requireActivity(), allAllowedPlacesType -> allowedPlacesTypes.addAll(allAllowedPlacesType));
+
+        //noinspection deprecation
+        nearbyDevicesViewModel = ViewModelProviders.of(requireActivity()).get(NearbyDevicesViewModel.class);
 
         return root;
     }
@@ -153,9 +162,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
                                 map.clear();
 
-                                if (getActivity() != null) {
-                                    allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
+                                //if (getActivity() != null) {
+                                    allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(Objects.requireNonNull(getActivity()), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
                                     // allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
+
+                                    nearbyDevicesViewModel.getNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS).observe(Objects.requireNonNull(getActivity()), allNearbyDevices -> nearbyDevices.addAll(allNearbyDevices));
+
+                                    for (NearbyDevice nearbyDevice : nearbyDevices){ // TODO insert in the heatmap
+                                        Log.d(TAG, nearbyDevice.toString());
+                                    }
 
                                     for (AllowedPlaces place : allowedPlaces) {
                                         Location placeLocation = new Location("");
@@ -171,14 +186,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
                                         }
                                     }
-                                }
+                               // }
                             }
 
                         } else {
                             lastNearbyLocation = curLocation;
 
                             map.clear();
-                            if (getActivity() != null) {
+                           // if (getActivity() != null) {
                                 allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
 
                                 //allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces)); // TODO check if pattern repository is right
@@ -198,7 +213,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                         new IconLoaderTask().execute(taskParameters);
                                     }
                                 }
-                            }
+                          //  }
                         }
                     }
                     else
@@ -243,14 +258,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         @Override
         protected void onPostExecute(Bitmap result) {
-
-            super.onPostExecute(result);
-            Marker marker = map.addMarker(new MarkerOptions()
-                    .position(position)
-                    .title(title)
-                    .icon(BitmapDescriptorFactory.fromBitmap(result)));
-
-            allMarkers.add(marker);
+            if (isAdded()) {
+                super.onPostExecute(result);
+                map.addMarker(new MarkerOptions()
+                        .position(position)
+                        .title(title)
+                        .icon(BitmapDescriptorFactory.fromBitmap(result)));
+            }
         }
     }
 }

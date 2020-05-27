@@ -14,5 +14,7 @@ public class Constants {
 
     public static int SIZE_PLACES_API_REQUEST = 20;
 
+    public static double NEARBY_DEVICES_RADIUS = 100;
+
 
 }
