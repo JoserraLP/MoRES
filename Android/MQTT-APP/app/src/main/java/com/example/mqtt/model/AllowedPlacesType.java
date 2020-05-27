@@ -5,6 +5,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Objects;
 
 @Entity
@@ -15,12 +18,24 @@ public class AllowedPlacesType {
     @NonNull
     private String type;
 
+    @ColumnInfo(name = "title")
+    @NonNull
+    private String title;
+
+
     @ColumnInfo(name = "isChecked")
     private boolean isChecked;
 
-    public AllowedPlacesType(@NonNull String type) {
+    @SerializedName("icon")
+    @Expose
+    @ColumnInfo(name = "icon")
+    private String icon;
+
+    public AllowedPlacesType(@NonNull String type, @NonNull String title, String icon) {
         this.type = type;
-        this.isChecked = false;
+        this.title = title;
+        this.isChecked = false; // TODO make by default is enabled
+        this.icon = icon;
     }
 
     @NonNull
@@ -32,6 +47,15 @@ public class AllowedPlacesType {
         this.type = type;
     }
 
+    @NonNull
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(@NonNull String title) {
+        this.title = title;
+    }
+
     public boolean isChecked() {
         return isChecked;
     }
@@ -40,13 +64,12 @@ public class AllowedPlacesType {
         isChecked = checked;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AllowedPlacesType that = (AllowedPlacesType) o;
-        return isChecked == that.isChecked &&
-                type.equals(that.type);
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     @NonNull
@@ -54,7 +77,21 @@ public class AllowedPlacesType {
     public String toString() {
         return "AllowedPlacesType{" +
                 "type='" + type + '\'' +
+                ", title='" + title + '\'' +
                 ", isChecked=" + isChecked +
+                ", icon='" + icon + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AllowedPlacesType that = (AllowedPlacesType) o;
+        return isChecked == that.isChecked &&
+                type.equals(that.type) &&
+                title.equals(that.title) &&
+                Objects.equals(icon, that.icon);
+    }
+
 }

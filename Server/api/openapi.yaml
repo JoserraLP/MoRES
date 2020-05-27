@@ -89,11 +89,8 @@ paths:
       requestBody:
         content:
           application/json:
-            schema:
-              properties:
-                type:
-                  type: string
-                  example: restaurant
+            schema: 
+              $ref: '#/components/schemas/AllowedPlacesType'
         required: true
       responses:
         201:
@@ -334,13 +331,16 @@ components:
     AllowedPlacesType:
       example:
         type: restaurant
-        idAllowedPlacesType: 1
+        title: Restaurant
+        icon: icon.png
       properties:
-        idAllowedPlacesType:
-          example: 1
-          format: int64
-          type: integer
         type:
           example: restaurant
+          type: string
+        title:
+          example: Restaurant
+          type: string
+        icon:
+          example: icon.png
           type: string
       type: object

@@ -58,7 +58,9 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
                     { $project : // Exclude the _id field
                         {  
                             "_id": 0, 
-                            "type": 1
+                            "type": 1,
+                            "title": 1,
+                            "icon": 1
                         }
                     }
                 ]).toArray(function(err, result) {
@@ -86,7 +88,9 @@ module.exports.postAllowedPlaceType = function(req, res, next) {
         if (err) throw err;
         var dbase = db.db("tfg");
         var data = {
-            type: req.undefined.value.type
+            type: req.undefined.value.type,
+            title: req.undefined.value.title,
+            icon: req.undefined.value.icon
         }
         dbase.collection("allowed_places_types").insertOne(data, function(err, response) {
             if (err) {

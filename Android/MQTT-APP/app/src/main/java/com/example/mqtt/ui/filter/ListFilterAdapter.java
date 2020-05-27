@@ -1,8 +1,6 @@
 package com.example.mqtt.ui.filter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +9,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -47,13 +44,20 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final AllowedPlacesType allowedPlacesTypeItem = data.get(position);
 
-        holder.allowedPlacesTypeTitle.setText(allowedPlacesTypeItem.getType());
+        holder.allowedPlacesTypeTitle.setText(allowedPlacesTypeItem.getTitle());
         holder.allowedPlacesTypeSwitch.setChecked(allowedPlacesTypeItem.isChecked());
 
         holder.allowedPlacesTypeSwitch.setOnClickListener(view -> {
             allowedPlacesTypeItem.setChecked(!allowedPlacesTypeItem.isChecked());
             allowedPlacesTypeViewModel.updateAllowedPlacesTypeChecked(allowedPlacesTypeItem);
         });
+
+        if(allowedPlacesTypeItem.getIcon() != null)
+            Glide.with(context)
+                    .load(allowedPlacesTypeItem.getIcon())
+                    .centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.allowedPlacesTypeImage);
 
     }
 
@@ -69,21 +73,17 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Vi
     }
 
 
-
-    public ArrayList<AllowedPlacesType> getAllowedPlacesTypes(){
-        return data;
-    }
-
-
     static class ViewHolder extends RecyclerView.ViewHolder {
         private Switch allowedPlacesTypeSwitch;
         private TextView allowedPlacesTypeTitle;
+        private ImageView allowedPlacesTypeImage;
 
         ViewHolder(View itemView) {
             super(itemView);
 
             allowedPlacesTypeSwitch = itemView.findViewById(R.id.allowed_places_type_switch);
             allowedPlacesTypeTitle = itemView.findViewById(R.id.allowed_places_type_value);
+            allowedPlacesTypeImage = itemView.findViewById(R.id.allowed_places_type_image);
         }
     }
 
