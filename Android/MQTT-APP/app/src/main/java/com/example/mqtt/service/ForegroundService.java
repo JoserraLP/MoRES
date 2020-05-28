@@ -9,7 +9,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Handler;
@@ -67,13 +66,6 @@ public class ForegroundService extends Service {
      * The identifier for the notification displayed for the foreground service.
      */
     private static final int NOTIFICATION_ID = 12345678;
-
-    /**
-     * Used to check whether the bound activity has really gone away and not unbound as part of an
-     * orientation change. We create a foreground service notification only if the former takes
-     * place.
-     */
-    private boolean mChangingConfiguration = false;
 
     private NotificationManager mNotificationManager;
 
@@ -146,6 +138,7 @@ public class ForegroundService extends Service {
 
         // Set the Notification Channel for the Notification Manager.
         mNotificationManager.createNotificationChannel(mChannel);
+
     }
 
     @Override
@@ -157,19 +150,12 @@ public class ForegroundService extends Service {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mChangingConfiguration = true;
-    }
-
-    @Override
     public IBinder onBind(Intent intent) {
         // Called when a client (MainActivity in case of this sample) comes to the foreground
         // and binds with this service. The service should cease to be a foreground service
         // when that happens.
         Log.i(TAG, "in onBind()");
         stopForeground(true);
-        mChangingConfiguration = false;
         return mBinder;
     }
 
@@ -179,8 +165,7 @@ public class ForegroundService extends Service {
         // and binds once again with this service. The service should cease to be a foreground
         // service when that happens.
         Log.i(TAG, "in onRebind()");
-        stopForeground(true);
-        mChangingConfiguration = false;
+        //stopForeground(true);
         super.onRebind(intent);
     }
 
@@ -191,10 +176,8 @@ public class ForegroundService extends Service {
         // Called when the last client (MainActivity in case of this sample) unbinds from this
         // service. If this method is called due to a configuration change in MainActivity, we
         // do nothing. Otherwise, we make this service a foreground service.
-        if (!mChangingConfiguration) {
-            Log.i(TAG, "Starting foreground service");
-            startForeground(NOTIFICATION_ID, getNotification());
-        }
+        Log.i(TAG, "Starting foreground service");
+        startForeground(NOTIFICATION_ID, getNotification());
         return true; // Ensures onRebind() is called when a client re-binds.
     }
 
@@ -210,13 +193,15 @@ public class ForegroundService extends Service {
      */
     public void requestLocationUpdates() {
         Log.i(TAG, "Requesting location updates");
-        startService(new Intent(getApplicationContext(), ForegroundService.class));
-        try {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                    mLocationCallback, Looper.myLooper());
-        } catch (SecurityException unlikely) {
-            Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
-        }
+        //if (!serviceIsRunningInForeground(getBaseContext())) {
+            startService(new Intent(getApplicationContext(), ForegroundService.class));
+            try {
+                mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                        mLocationCallback, Looper.myLooper());
+            } catch (SecurityException unlikely) {
+                Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
+            }
+        //}
     }
 
     /**

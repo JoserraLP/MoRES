@@ -29,8 +29,6 @@ import com.example.mqtt.service.ForegroundService;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.Objects;
-
 public class DrawerActivity extends AppCompatActivity {
 
     private static final String TAG = DrawerActivity.class.getSimpleName();
@@ -44,8 +42,6 @@ public class DrawerActivity extends AppCompatActivity {
     // A reference to the background service used.
     private ForegroundService mService = null;
 
-    // Tracks the bound state of the service.
-    private boolean mBound = false;
 
     // Monitors the state of the connection to the service.
     private ServiceConnection mServiceConnection;
@@ -87,13 +83,11 @@ public class DrawerActivity extends AppCompatActivity {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 ForegroundService.LocalBinder binder = (ForegroundService.LocalBinder) service;
                 mService = binder.getService();
-                mBound = true;
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 mService = null;
-                mBound = false;
             }
         };
 
@@ -101,6 +95,7 @@ public class DrawerActivity extends AppCompatActivity {
         if (checkPermissions()) {
             requestPermissions();
         }
+
     }
 
     @Override
@@ -127,24 +122,6 @@ public class DrawerActivity extends AppCompatActivity {
         }
 
 }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        if (mBound) {
-            // Unbind from the service. This signals to the service that this activity is no longer
-            // in the foreground, and the service can respond by promoting itself to a foreground
-            // service.
-            unbindService(mServiceConnection);
-            mBound = false;
-        }
-
-        super.onStop();
-    }
 
 
     @Override
