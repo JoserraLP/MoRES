@@ -165,7 +165,7 @@ public class ForegroundService extends Service {
         // and binds once again with this service. The service should cease to be a foreground
         // service when that happens.
         Log.i(TAG, "in onRebind()");
-        //stopForeground(true);
+        stopForeground(true);
         super.onRebind(intent);
     }
 
@@ -193,7 +193,6 @@ public class ForegroundService extends Service {
      */
     public void requestLocationUpdates() {
         Log.i(TAG, "Requesting location updates");
-        //if (!serviceIsRunningInForeground(getBaseContext())) {
             startService(new Intent(getApplicationContext(), ForegroundService.class));
             try {
                 mFusedLocationClient.requestLocationUpdates(mLocationRequest,
@@ -201,7 +200,6 @@ public class ForegroundService extends Service {
             } catch (SecurityException unlikely) {
                 Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
             }
-        //}
     }
 
     /**

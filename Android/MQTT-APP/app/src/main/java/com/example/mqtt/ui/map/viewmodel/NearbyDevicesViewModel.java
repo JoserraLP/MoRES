@@ -1,13 +1,11 @@
-package com.example.mqtt.ui.home.viewmodel;
+package com.example.mqtt.ui.map.viewmodel;
 
 import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.example.mqtt.data.repository.AllowedPlacesRepository;
 import com.example.mqtt.data.repository.NearbyDevicesRepository;
-import com.example.mqtt.model.AllowedPlaces;
 import com.example.mqtt.model.NearbyDevice;
 
 import java.util.List;

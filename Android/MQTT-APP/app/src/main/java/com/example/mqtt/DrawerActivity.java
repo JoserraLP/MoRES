@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -28,6 +30,8 @@ import com.example.mqtt.data.repository.DeviceIDRepository;
 import com.example.mqtt.service.ForegroundService;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.Locale;
 
 public class DrawerActivity extends AppCompatActivity {
 
@@ -57,6 +61,10 @@ public class DrawerActivity extends AppCompatActivity {
             DeviceIDRepository.getInstance(getApplication()).loadDeviceID();
         }
 
+        String languageCode = getSharedPreferences("settings", Context.MODE_PRIVATE).getString("language", "es");
+        if (!languageCode.equals(Locale.getDefault().getLanguage()))
+            putLanguage(languageCode);
+
         setContentView(R.layout.activity_drawer);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,7 +77,7 @@ public class DrawerActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_news, R.id.nav_settings)
+                R.id.nav_map, R.id.nav_news, R.id.nav_settings)
                 .setDrawerLayout(drawer)
                 .build();
 
@@ -105,7 +113,7 @@ public class DrawerActivity extends AppCompatActivity {
         // Bind to the service. If the service is in foreground mode, this signals to the service
         // that since this activity is in the foreground, the service can exit foreground mode.
         bindService(new Intent(this, ForegroundService.class), mServiceConnection,
-                Context.BIND_AUTO_CREATE);
+             Context.BIND_AUTO_CREATE);
 
     }
 
@@ -121,7 +129,16 @@ public class DrawerActivity extends AppCompatActivity {
                 mService.requestLocationUpdates();
         }
 
-}
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if(mService != null)
+            mService.stopSelf();
+        stopService(new Intent(this, ForegroundService.class));
+        unbindService(mServiceConnection);
+    }
 
 
     @Override
@@ -157,7 +174,7 @@ public class DrawerActivity extends AppCompatActivity {
         if (shouldProvideRationale) {
             Log.i(TAG, "Displaying permission rationale to provide additional context.");
             Snackbar.make(
-                    findViewById(R.layout.activity_main),
+                    findViewById(R.layout.activity_drawer),
                     "Location permission is needed for core functionality"
                     ,
                     Snackbar.LENGTH_INDEFINITE)
@@ -199,5 +216,14 @@ public class DrawerActivity extends AppCompatActivity {
                 Log.i(TAG, "Permission denied.");
             }
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void putLanguage(String languageCode) {
+        Locale locale = new Locale(languageCode); // where 'hi' is Language code, set this as per your Spinner Item selected
+        Locale.setDefault(locale);
+        Configuration config = getResources().getConfiguration();
+        config.locale = locale;
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 }

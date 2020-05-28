@@ -1,4 +1,4 @@
-package com.example.mqtt.ui.home;
+package com.example.mqtt.ui.map;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -28,8 +28,8 @@ import com.example.mqtt.model.AllowedPlacesType;
 import com.example.mqtt.model.NearbyDevice;
 import com.example.mqtt.service.ForegroundService;
 import com.example.mqtt.ui.filter.viewmodel.AllowedPlacesTypeViewModel;
-import com.example.mqtt.ui.home.viewmodel.AllowedPlacesViewModel;
-import com.example.mqtt.ui.home.viewmodel.NearbyDevicesViewModel;
+import com.example.mqtt.ui.map.viewmodel.AllowedPlacesViewModel;
+import com.example.mqtt.ui.map.viewmodel.NearbyDevicesViewModel;
 import com.example.mqtt.utils.Constants;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,23 +37,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
-import com.google.maps.android.data.kml.KmlGroundOverlay;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import java.net.URL;
-import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
-    private static final String TAG = HomeFragment.class.getSimpleName();
+    private static final String TAG = MapFragment.class.getSimpleName();
 
     private GoogleMap map;
 
@@ -83,7 +80,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         // Inflate the map fragment
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        View root = inflater.inflate(R.layout.fragment_map, container, false);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         if (mapFragment != null)

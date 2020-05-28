@@ -1,4 +1,4 @@
-package com.example.mqtt.ui.home.viewmodel;
+package com.example.mqtt.ui.map.viewmodel;
 
 import android.app.Application;
 

@@ -1,4 +1,4 @@
-package com.example.mqtt.ui.home.viewmodel;
+package com.example.mqtt.ui.map.viewmodel;
 
 import android.app.Application;
 
@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData;
 import com.example.mqtt.data.repository.AllowedPlacesRepository;
 import com.example.mqtt.model.AllowedPlaces;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AllowedPlacesViewModel extends AndroidViewModel {

@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_map">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.example.mqtt.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home">
+        android:id="@+id/nav_map"
+        android:name="com.example.mqtt.ui.map.MapFragment"
+        android:label="@string/menu_map"
+        tools:layout="@layout/fragment_map">
 
         <action
             android:id="@+id/action_nav_home_to_nav_news"
@@ -43,9 +43,9 @@
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.example.mqtt.ui.settings.SlideshowFragment"
+        android:name="com.example.mqtt.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_settings" />
 
     <fragment
         android:id="@+id/nav_filter"

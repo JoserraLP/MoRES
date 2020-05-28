@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MQTT-APP</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+
+    <string name="menu_map">Mapa</string>
+    <string name="menu_news">Noticias</string>
+    <string name="menu_settings">Configuracion</string>
+    <string name="title_activity_maps">Mapa</string>
+    <string name="title_activity_drawer">DrawerActivity</string>
+    <string name="navigation_drawer_open">Abrir navigation drawer</string>
+    <string name="navigation_drawer_close">Cerrar navigation drawer</string>
+
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Configuracion</string>
+    <string name="select_language">Selecciona idioma</string>
+
+    <string name="location">Ubicación actual: %1$s</string>
+
+    <string name="news_image">Imagen de la noticia</string>
+    <string name="news_title">Titulo de la noticia</string>
+    <string name="date_title">Fecha:</string>
+    <string name="author_title">Autor:</string>
+    <string name="launch_activity">Abrir aplicacion</string>
+    <string name="menu_filter">Filtro</string>
+    <string name="allowed_places_type_title">Tipos de lugares permitidos</string>
+    <string name="filter_layout_title">Seleciona los tipos de lugares para mostrar</string>
+    <string name="allowed_places_type_image">Icono de tipos de lugares permitidos</string>
+
+
+    <string-array name="languages_array">
+        <item>Español</item>
+        <item>Inglés</item>
+    </string-array>
+</resources>
