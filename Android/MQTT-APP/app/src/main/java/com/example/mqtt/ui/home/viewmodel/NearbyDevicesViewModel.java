@@ -16,15 +16,13 @@ public class NearbyDevicesViewModel extends AndroidViewModel {
 
     private NearbyDevicesRepository mRepository;
 
-    private LiveData<List<NearbyDevice>> mNearbyDevices;
-
     public NearbyDevicesViewModel(Application application) {
         super(application);
-        mRepository = NearbyDevicesRepository.getInstance();
+        mRepository = NearbyDevicesRepository.getInstance(application);
     }
 
-    public LiveData<List<NearbyDevice>> getNearbyDevices(double lat, double lng, double radius) {
-        return mRepository.getNearbyDevices(lat, lng, radius);
+    public LiveData<List<NearbyDevice>> getNearbyDevices() {
+        return mRepository.getNearbyDevices();
     }
 
 }

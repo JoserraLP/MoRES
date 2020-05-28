@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.mqtt.R;
+import com.example.mqtt.data.repository.NearbyDevicesRepository;
 import com.example.mqtt.model.AllowedPlaces;
 import com.example.mqtt.model.AllowedPlacesType;
 import com.example.mqtt.model.NearbyDevice;
@@ -38,8 +39,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.android.gms.maps.model.TileProvider;
+import com.google.maps.android.data.kml.KmlGroundOverlay;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import java.net.URL;
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -70,6 +77,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<AllowedPlaces> allowedPlaces;
 
     private ArrayList<NearbyDevice> nearbyDevices;
+
+    private TileOverlay mOverlay;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -166,11 +175,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                     allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(Objects.requireNonNull(getActivity()), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
                                     // allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
 
-                                    nearbyDevicesViewModel.getNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS).observe(Objects.requireNonNull(getActivity()), allNearbyDevices -> nearbyDevices.addAll(allNearbyDevices));
+                                    NearbyDevicesRepository.getInstance(getActivity().getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
+                                    nearbyDevicesViewModel.getNearbyDevices().observe(Objects.requireNonNull(getActivity()), allNearbyDevices -> nearbyDevices.addAll(allNearbyDevices));
 
                                     for (NearbyDevice nearbyDevice : nearbyDevices){ // TODO insert in the heatmap
                                         Log.d(TAG, nearbyDevice.toString());
                                     }
+
+                                    addHeatMap(processNearbyDevices(nearbyDevices));
 
                                     for (AllowedPlaces place : allowedPlaces) {
                                         Location placeLocation = new Location("");
@@ -197,6 +209,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                 allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
 
                                 //allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces)); // TODO check if pattern repository is right
+
+                            NearbyDevicesRepository.getInstance(Objects.requireNonNull(getActivity()).getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
+                            nearbyDevicesViewModel.getNearbyDevices().observe(Objects.requireNonNull(getActivity()), allNearbyDevices -> nearbyDevices.addAll(allNearbyDevices));
+
+                            for (NearbyDevice nearbyDevice : nearbyDevices){ // TODO insert in the heatmap
+                                Log.d(TAG, nearbyDevice.toString());
+                            }
+
+                            addHeatMap(processNearbyDevices(nearbyDevices));
 
                                 for (AllowedPlaces place : allowedPlaces) {
                                     Log.d(TAG, "New nearby places");
@@ -226,6 +247,28 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    private ArrayList<LatLng> processNearbyDevices(ArrayList<NearbyDevice> nearbyDevices){
+        ArrayList<LatLng> nearbyDevicesLatLng = new ArrayList<>();
+
+        for (NearbyDevice nearbyDevice : nearbyDevices)
+            nearbyDevicesLatLng.add(new LatLng(nearbyDevice.getGeo_lat(), nearbyDevice.getGeo_long()));
+
+        return nearbyDevicesLatLng;
+    }
+
+    private void addHeatMap(ArrayList<LatLng> nearbyDevicesLatLng){
+        // Create a heat map tile provider, passing it the latlngs of the police stations.
+        if (!nearbyDevicesLatLng.isEmpty()) {
+            TileProvider mProvider = new HeatmapTileProvider.Builder()
+                    .data(nearbyDevicesLatLng)
+                    .build();
+            // Add a tile overlay to the map, using the heat map tile provider.
+            mOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        }else{
+            if (mOverlay != null)
+                mOverlay.remove();
+        }
+    }
 
     @SuppressLint("StaticFieldLeak")
     class IconLoaderTask extends AsyncTask <ArrayList<Object>, String, Bitmap>
@@ -251,9 +294,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         @Override
         protected void onPreExecute() {
-            // TODO Auto-generated method stub
             super.onPreExecute();
-
         }
 
         @Override

@@ -34,22 +34,22 @@ public class NearbyDevicesRepository {
 
     private RetrofitClient retrofit = RetrofitClient.getInstance();
 
+    private ArrayList<NearbyDevice> nearbyDevices;
 
-    public static synchronized NearbyDevicesRepository getInstance(){
+
+    public static synchronized NearbyDevicesRepository getInstance(Application application){
         if(mInstance == null){
             mInstance = new NearbyDevicesRepository();
         }
         return mInstance;
     }
 
-    private NearbyDevicesRepository() {
+    private NearbyDevicesRepository(){
+        nearbyDevices = new ArrayList<>();
     }
 
-    public LiveData<List<NearbyDevice>> getNearbyDevices(double lat, double lng, double radius) {
+    public void loadNearbyDevices(double lat, double lng, double radius) {
         Call<NearbyDevicesResponse> nearbyDeviceResponseCall = retrofit.getNearbyDevicesServiceAPI().getNearbyDevices(lat, lng, radius);
-
-        List<NearbyDevice> nearbyDevicesList = new ArrayList<>();
-        LiveData<List<NearbyDevice>> nearbyDevices;
 
         nearbyDeviceResponseCall.enqueue(new Callback<NearbyDevicesResponse>() {
             @Override
@@ -59,10 +59,10 @@ public class NearbyDevicesRepository {
                     assert nearbyDevicesResponse != null;
                     ArrayList<NearbyDevicesResponseItem> listNearbyDevices = nearbyDevicesResponse.getResults();
                     for (NearbyDevicesResponseItem nearbyDevicesResponseItem : listNearbyDevices) {
-                        Log.d(TAG, nearbyDevicesResponseItem.toString());
-                        nearbyDevicesList.add(processResponseItem(nearbyDevicesResponseItem));
+                        //Log.d(TAG, nearbyDevicesResponseItem.toString());
+                        // TODO insert in a list
+                        insertNearbyDevice(processResponseItem(nearbyDevicesResponseItem));
                     }
-
                 }
             }
 
@@ -71,10 +71,15 @@ public class NearbyDevicesRepository {
                 Log.d(TAG, Objects.requireNonNull(t.getMessage()));
             }
         });
+    }
 
-        nearbyDevices = new MutableLiveData<>(nearbyDevicesList);
+    private void insertNearbyDevice(NearbyDevice nearbyDevice){
+        this.nearbyDevices.add(nearbyDevice);
+        Log.d(TAG, "Added nearby device " + nearbyDevice.toString());
+    }
 
-        return nearbyDevices;
+    public LiveData<List<NearbyDevice>> getNearbyDevices(){
+        return new MutableLiveData<>(this.nearbyDevices);
     }
 
     private NearbyDevice processResponseItem (NearbyDevicesResponseItem nearbyDevicesResponseItem){
