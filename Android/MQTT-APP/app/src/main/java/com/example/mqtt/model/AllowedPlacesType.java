@@ -34,7 +34,6 @@ public class AllowedPlacesType {
     public AllowedPlacesType(@NonNull String type, @NonNull String title, String icon) {
         this.type = type;
         this.title = title;
-        this.isChecked = false; // TODO make by default is enabled
         this.icon = icon;
     }
 

@@ -55,8 +55,10 @@ public class AllowedPlacesTypeRepository {
                     assert allowedPlacesTypeResponse != null;
                     ArrayList<AllowedPlacesType> listAllowedPlacesTypes = allowedPlacesTypeResponse.getResults();
                     allAllowedPlacesType.setValue(listAllowedPlacesTypes);
-                    for (AllowedPlacesType placeType : listAllowedPlacesTypes)
+                    for (AllowedPlacesType placeType : listAllowedPlacesTypes) {
+                        placeType.setChecked(true);
                         insertAllowedPlaceType(new MutableLiveData<>(placeType));
+                    }
 
                 }
             }
