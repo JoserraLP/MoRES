@@ -48,6 +48,9 @@ public class DrawerActivity extends AppCompatActivity {
     // Monitors the state of the connection to the service.
     private ServiceConnection mServiceConnection;
 
+    // Tracks the bound state of the service.
+    private boolean mBound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,11 +92,13 @@ public class DrawerActivity extends AppCompatActivity {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 ForegroundService.LocalBinder binder = (ForegroundService.LocalBinder) service;
                 mService = binder.getService();
+                mBound = true;
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 mService = null;
+                mBound = false;
             }
         };
 
@@ -135,9 +140,25 @@ public class DrawerActivity extends AppCompatActivity {
         if(mService != null)
             mService.stopSelf();
         stopService(new Intent(this, ForegroundService.class));
-        unbindService(mServiceConnection);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        if (mBound) {
+            // Unbind from the service. This signals to the service that this activity is no longer
+            // in the foreground, and the service can respond by promoting itself to a foreground
+            // service.
+            unbindService(mServiceConnection);
+            mBound = false;
+        }
+
+        super.onStop();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -94,6 +94,7 @@ public class Receiver extends BroadcastReceiver {
                             AllowedPlacesRepository.getInstance(Objects.requireNonNull(application)).loadAllowedPlacesByLocation(locationString);
                         }
 
+
                     } else {
                         Log.d(TAG, "Loading nearby locations");
                         lastNearbyLocation = curLocation;
@@ -124,6 +125,23 @@ public class Receiver extends BroadcastReceiver {
             }
             else {
                 curLocation = location;
+                if (lastNearbyLocation != null) {
+                    if (curLocation.distanceTo(lastNearbyLocation) > 200) { // TODO load near places. Do this with the location from the first time for example.
+                        lastNearbyLocation = curLocation;
+                        Log.d(TAG, "Loading nearby locations by distance");
+                        String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
+                        // Load all the allowed places
+                        AllowedPlacesRepository.getInstance(Objects.requireNonNull(application)).loadAllowedPlacesByLocation(locationString);
+                    }
+
+
+                } else {
+                    Log.d(TAG, "Loading nearby locations");
+                    lastNearbyLocation = curLocation;
+                    String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
+                    // Load all the allowed places
+                    AllowedPlacesRepository.getInstance(Objects.requireNonNull(application)).loadAllowedPlacesByLocation(locationString);
+                }
             }
 
 

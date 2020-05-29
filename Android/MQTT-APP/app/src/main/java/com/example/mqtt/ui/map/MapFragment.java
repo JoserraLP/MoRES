@@ -175,10 +175,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                     NearbyDevicesRepository.getInstance(getActivity().getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
                                     nearbyDevicesViewModel.getNearbyDevices().observe(Objects.requireNonNull(getActivity()), allNearbyDevices -> nearbyDevices.addAll(allNearbyDevices));
 
-                                    for (NearbyDevice nearbyDevice : nearbyDevices){ // TODO insert in the heatmap
-                                        Log.d(TAG, nearbyDevice.toString());
-                                    }
-
                                     addHeatMap(processNearbyDevices(nearbyDevices));
 
                                     for (AllowedPlaces place : allowedPlaces) {
@@ -205,14 +201,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                            // if (getActivity() != null) {
                                 allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
 
-                                //allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces)); // TODO check if pattern repository is right
-
                             NearbyDevicesRepository.getInstance(Objects.requireNonNull(getActivity()).getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
                             nearbyDevicesViewModel.getNearbyDevices().observe(Objects.requireNonNull(getActivity()), allNearbyDevices -> nearbyDevices.addAll(allNearbyDevices));
-
-                            for (NearbyDevice nearbyDevice : nearbyDevices){ // TODO insert in the heatmap
-                                Log.d(TAG, nearbyDevice.toString());
-                            }
 
                             addHeatMap(processNearbyDevices(nearbyDevices));
 
@@ -261,10 +251,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .build();
             // Add a tile overlay to the map, using the heat map tile provider.
             mOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-        }else{
+        } else
             if (mOverlay != null)
                 mOverlay.remove();
-        }
+
     }
 
     @SuppressLint("StaticFieldLeak")
