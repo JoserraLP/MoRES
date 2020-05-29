@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 
 import json
 
-client = mqtt.Client("Publisher_test")
+client = mqtt.Client("News_Publisher")
 
 client.connect("192.168.1.83", port=1883)
 
@@ -10,13 +10,15 @@ client.connect("192.168.1.83", port=1883)
 
 # payload = input("Insert the payload: \n")
 
-payload = json.dumps({
+payload = json.dumps({ 
   "title": "Patata-Sp",
   "date": "07/05/2020",
+  "author": "JoserraLP",
   "description": "This is the first description",
-  "location": "Spain",
+  "location": "Extremadura",
+  "expansion": "AdminArea",
   "image": "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg",
-  "relevance" : "Relevant"
+  "relevance" : 0
 })
 
 client.publish("News", payload)
