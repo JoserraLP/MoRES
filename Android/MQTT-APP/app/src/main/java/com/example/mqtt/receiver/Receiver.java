@@ -182,9 +182,9 @@ public class Receiver extends BroadcastReceiver {
         }
 
         // Receive an update from AllowedPlaces topic
-        String allowedPlaces = intent.getStringExtra(MQTTClient.EXTRA_ALLOWED_PLACES);
-        if (allowedPlaces != null && allowedPlaces.equals("Updated")) {
-            Log.d(TAG, "Loading new allowed places");
+        int allowedPlaces = intent.getIntExtra(MQTTClient.EXTRA_ALLOWED_PLACES_TYPES, 0);
+        if (allowedPlaces == 1) {
+            Log.d(TAG, "Loading new allowed places types");
             AllowedPlacesTypeRepository.getInstance(this.application).loadAllAllowedPlacesTypes();
         }
     }

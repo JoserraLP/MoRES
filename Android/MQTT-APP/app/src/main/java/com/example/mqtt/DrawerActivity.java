@@ -9,7 +9,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -46,7 +45,6 @@ public class DrawerActivity extends AppCompatActivity {
     // A reference to the background service used.
     private ForegroundService mService = null;
 
-
     // Monitors the state of the connection to the service.
     private ServiceConnection mServiceConnection;
 
@@ -57,8 +55,11 @@ public class DrawerActivity extends AppCompatActivity {
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
 
         if (pref.getString("DeviceID", null) == null) {
-            // Load all the allowed places
+            // Load the device ID
             DeviceIDRepository.getInstance(getApplication()).loadDeviceID();
+
+            // Load all the allowed places
+            AllowedPlacesTypeRepository.getInstance(getApplication()).loadAllAllowedPlacesTypes();
         }
 
         String languageCode = getSharedPreferences("settings", Context.MODE_PRIVATE).getString("language", "es");
@@ -70,9 +71,6 @@ public class DrawerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-
-        // Load all the allowed places
-        AllowedPlacesTypeRepository.getInstance(getApplication()).loadAllAllowedPlacesTypes();
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.

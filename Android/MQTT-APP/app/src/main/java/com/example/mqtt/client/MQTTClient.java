@@ -29,7 +29,7 @@ public class MQTTClient {
     public static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
 
     public static final String EXTRA_NEWS = PACKAGE_NAME + ".news";
-    public static final String EXTRA_ALLOWED_PLACES = PACKAGE_NAME + ".allowed_places";
+    public static final String EXTRA_ALLOWED_PLACES_TYPES = PACKAGE_NAME + ".allowed_places_types";
 
     @SuppressLint("StaticFieldLeak")
     private static MQTTClient INSTANCE = null;
@@ -76,10 +76,10 @@ public class MQTTClient {
                         intent.putExtra(EXTRA_NEWS, mqttMessage.toString());
 
                     }
-                    else if (topic.equals("AllowedPlaces")) {
+                    else if (topic.equals("AllowedPlacesTypes")) {
                         Log.d(TAG, mqttMessage.toString());
-                        // Notify anyone listening for broadcasts about the allowed places.
-                        intent.putExtra(EXTRA_ALLOWED_PLACES, mqttMessage.toString());
+                        // Notify anyone listening for broadcasts about the allowed places types.
+                        intent.putExtra(EXTRA_ALLOWED_PLACES_TYPES, Integer.valueOf(mqttMessage.toString()));
 
                     }
                     LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -99,7 +99,7 @@ public class MQTTClient {
 
                     //Subscribe to all relevant topics
                     subscribe("News", 0);
-                    subscribe("AllowedPlaces", 0);
+                    subscribe("AllowedPlacesTypes", 0);
                 }
 
                 @Override
