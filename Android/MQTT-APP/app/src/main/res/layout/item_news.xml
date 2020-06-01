@@ -1,33 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
+    android:id="@+id/layout_news_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
     android:background="@drawable/border"
-    tools:ignore="UseCompoundDrawables"
-    android:clickable="true">
+    android:clickable="true"
+    android:orientation="horizontal"
+    tools:ignore="UseCompoundDrawables">
 
-            <ImageView
-                android:id="@+id/news_image"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
-                android:layout_gravity="center_horizontal"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/news_image" />
+    <ImageView
+        android:id="@+id/news_image"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_gravity="center_horizontal"
+        android:clickable="true"
+        android:contentDescription="@string/news_image"
+        android:focusable="true" />
 
-            <TextView
-                android:id="@+id/allowed_places_type_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/news_title"
-                android:textAlignment="textStart"
-                android:layout_gravity="center"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:layout_marginStart="10dp"
-                tools:ignore="RtlCompat" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/news_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:text="@string/news_title"
+            android:textAlignment="textStart"
+            android:textSize="20sp"
+            android:layout_marginTop="20dp"
+            android:textStyle="bold"
+            tools:ignore="RtlCompat" />
+
+        <TextView
+            android:id="@+id/news_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="end"
+            android:textAlignment="textStart"
+            tools:ignore="RtlCompat"
+            android:text="@string/news_date"/>
+    </LinearLayout>
 
 </LinearLayout>

@@ -26,6 +26,7 @@
     <string name="allowed_places_type_title">Allowed Places Type</string>
     <string name="filter_layout_title">Select places types to show</string>
     <string name="allowed_places_type_image">Allowed Places Types Icon</string>
+     <string name="news_date">01/01/2020</string>
 
 
      <string-array name="languages_array">

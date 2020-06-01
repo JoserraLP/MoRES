@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -45,6 +46,7 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final News newsItem = data.get(position);
         holder.newsTitle.setText(newsItem.getTitle());
+        holder.newsDate.setText(newsItem.getDate());
 
         if(newsItem.getImage() != null)
             Glide.with(context)
@@ -53,6 +55,12 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.newsImageView);
 
+        holder.linearLayout.setOnClickListener(view -> {
+            newsViewModel.select(newsItem);
+            Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_news_item);
+        });
+
+            /*
         holder.newsImageView.setOnClickListener(view -> {
             newsViewModel.select(newsItem);
             Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_news_item);
@@ -62,6 +70,8 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
             newsViewModel.select(newsItem);
             Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_news_item);
         });
+
+             */
 
     }
 
@@ -86,12 +96,17 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView newsImageView;
         private TextView newsTitle;
+        private TextView newsDate;
+        private LinearLayout linearLayout;
 
         ViewHolder(View itemView) {
             super(itemView);
 
             newsImageView = itemView.findViewById(R.id.news_image);
-            newsTitle = itemView.findViewById(R.id.allowed_places_type_value);
+            newsTitle = itemView.findViewById(R.id.news_title);
+            newsDate = itemView.findViewById(R.id.news_date);
+            linearLayout = itemView.findViewById(R.id.layout_news_item);
+
         }
     }
 
