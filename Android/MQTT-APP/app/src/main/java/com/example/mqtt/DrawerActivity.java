@@ -12,7 +12,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Menu;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,7 +45,21 @@ public class DrawerActivity extends AppCompatActivity {
     private ForegroundService mService = null;
 
     // Monitors the state of the connection to the service.
-    private ServiceConnection mServiceConnection;
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            ForegroundService.LocalBinder binder = (ForegroundService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            mBound = false;
+        }
+    };
 
     // Tracks the bound state of the service.
     private boolean mBound = false;
@@ -55,10 +68,11 @@ public class DrawerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        SharedPreferences pref = getApplication().getSharedPreferences("settings", 0); // 0 - for private mode
 
         if (pref.getString("DeviceID", null) == null) {
             // Load the device ID
+            Log.d(TAG, "Retrieving Device ID");
             DeviceIDRepository.getInstance(getApplication()).loadDeviceID();
 
             // Load all the allowed places
@@ -86,22 +100,6 @@ public class DrawerActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        mServiceConnection = new ServiceConnection() {
-
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                ForegroundService.LocalBinder binder = (ForegroundService.LocalBinder) service;
-                mService = binder.getService();
-                mBound = true;
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                mService = null;
-                mBound = false;
-            }
-        };
-
         // Check that the user hasn't revoked permissions by going to Settings.
         if (checkPermissions()) {
             requestPermissions();
@@ -124,14 +122,12 @@ public class DrawerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         if (checkPermissions()) {
             requestPermissions();
-        } else {
-            if (mService != null)
-                mService.requestLocationUpdates();
+        } else { // TODO here start the service
+            Log.d(TAG, "On resume with permissions");
+            startService(new Intent(this, ForegroundService.class));
         }
-
     }
 
     @Override
@@ -156,7 +152,6 @@ public class DrawerActivity extends AppCompatActivity {
             unbindService(mServiceConnection);
             mBound = false;
         }
-
         super.onStop();
     }
 
@@ -186,7 +181,7 @@ public class DrawerActivity extends AppCompatActivity {
         if (shouldProvideRationale) {
             Log.i(TAG, "Displaying permission rationale to provide additional context.");
             Snackbar.make(
-                    findViewById(R.layout.activity_drawer),
+                    findViewById(R.id.snackbar_view),
                     "Location permission is needed for core functionality"
                     ,
                     Snackbar.LENGTH_INDEFINITE)
@@ -222,6 +217,7 @@ public class DrawerActivity extends AppCompatActivity {
                 Log.i(TAG, "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission was granted.
+                startService(new Intent(this, ForegroundService.class));
                 mService.requestLocationUpdates();
             } else {
                 // Permission denied.

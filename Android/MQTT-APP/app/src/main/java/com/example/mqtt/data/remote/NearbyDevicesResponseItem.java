@@ -7,10 +7,21 @@ import java.util.Objects;
 
 public class NearbyDevicesResponseItem {
 
+    private String _id;
+
     private DeviceLocation location;
 
-    public NearbyDevicesResponseItem(DeviceLocation location) {
+    public NearbyDevicesResponseItem(String _id, DeviceLocation location) {
+        this._id = _id;
         this.location = location;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
     public DeviceLocation getLocation() {
@@ -26,14 +37,16 @@ public class NearbyDevicesResponseItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NearbyDevicesResponseItem that = (NearbyDevicesResponseItem) o;
-        return Objects.equals(location, that.location);
+        return Objects.equals(_id, that._id) &&
+                Objects.equals(location, that.location);
     }
 
     @NonNull
     @Override
     public String toString() {
         return "NearbyDevicesResponseItem{" +
-                "location=" + location +
+                "_id='" + _id + '\'' +
+                ", location=" + location +
                 '}';
     }
 

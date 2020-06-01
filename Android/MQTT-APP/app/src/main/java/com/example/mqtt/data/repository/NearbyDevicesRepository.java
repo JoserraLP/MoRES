@@ -1,6 +1,7 @@
 package com.example.mqtt.data.repository;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -36,20 +37,26 @@ public class NearbyDevicesRepository {
 
     private ArrayList<NearbyDevice> nearbyDevices;
 
+    private String deviceID;
+
+    private SharedPreferences pref;
+
 
     public static synchronized NearbyDevicesRepository getInstance(Application application){
         if(mInstance == null){
-            mInstance = new NearbyDevicesRepository();
+            mInstance = new NearbyDevicesRepository(application);
         }
         return mInstance;
     }
 
-    private NearbyDevicesRepository(){
+    private NearbyDevicesRepository(Application application){
         nearbyDevices = new ArrayList<>();
+        pref = application.getSharedPreferences("settings", 0); // 0 - for private mode
     }
 
     public void loadNearbyDevices(double lat, double lng, double radius) {
         Call<NearbyDevicesResponse> nearbyDeviceResponseCall = retrofit.getNearbyDevicesServiceAPI().getNearbyDevices(lat, lng, radius);
+
 
         nearbyDeviceResponseCall.enqueue(new Callback<NearbyDevicesResponse>() {
             @Override
@@ -58,10 +65,11 @@ public class NearbyDevicesRepository {
                     NearbyDevicesResponse nearbyDevicesResponse = response.body();
                     assert nearbyDevicesResponse != null;
                     ArrayList<NearbyDevicesResponseItem> listNearbyDevices = nearbyDevicesResponse.getResults();
+                    deviceID = pref.getString("DeviceID", null);
                     for (NearbyDevicesResponseItem nearbyDevicesResponseItem : listNearbyDevices) {
-                        //Log.d(TAG, nearbyDevicesResponseItem.toString());
-                        // TODO insert in a list
-                        insertNearbyDevice(processResponseItem(nearbyDevicesResponseItem));
+                        Log.d(TAG, nearbyDevicesResponseItem.get_id());
+                        if(deviceID != null && !deviceID.equals(nearbyDevicesResponseItem.get_id()))
+                            insertNearbyDevice(processResponseItem(nearbyDevicesResponseItem));
                     }
                 }
             }

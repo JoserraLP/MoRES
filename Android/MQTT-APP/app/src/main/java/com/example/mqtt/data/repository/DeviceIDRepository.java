@@ -69,8 +69,9 @@ public class DeviceIDRepository {
                     deviceID.setDeviceID(id);
                     insertDeviceID(new MutableLiveData<>(deviceID));
 
+                    Log.d(TAG, "Saving device ID " + id);
                     // Save the data on the preferences of the app
-                    SharedPreferences pref = application.getSharedPreferences("MyPref", 0); // 0 - for private mode
+                    SharedPreferences pref = application.getSharedPreferences("settings", 0); // 0 - for private mode
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putString("DeviceID", id);
                     editor.apply();

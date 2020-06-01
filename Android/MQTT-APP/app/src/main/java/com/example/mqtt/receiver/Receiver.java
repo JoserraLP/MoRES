@@ -8,8 +8,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -21,23 +19,16 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.mqtt.DrawerActivity;
 import com.example.mqtt.R;
 import com.example.mqtt.client.MQTTClient;
-import com.example.mqtt.data.repository.AllowedPlacesRepository;
 import com.example.mqtt.data.repository.AllowedPlacesTypeRepository;
 import com.example.mqtt.data.repository.NewsRepository;
-import com.example.mqtt.model.AllowedPlaces;
 import com.example.mqtt.model.News;
 import com.example.mqtt.service.ForegroundService;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 public class Receiver extends BroadcastReceiver {
@@ -62,8 +53,6 @@ public class Receiver extends BroadcastReceiver {
     private static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
             ".started_from_notification";
 
-    private Location lastNearbyLocation;
-
 
     public Receiver(Application application){
         this.application = application;
@@ -85,26 +74,7 @@ public class Receiver extends BroadcastReceiver {
                 if (curLocation.getLongitude() != location.getLongitude() && curLocation.getLatitude() != location.getLatitude()) {
                     curLocation = location;
 
-                    if (lastNearbyLocation != null) {
-                        if (curLocation.distanceTo(lastNearbyLocation) > 200) { // TODO load near places. Do this with the location from the first time for example.
-                            lastNearbyLocation = curLocation;
-                            Log.d(TAG, "Loading nearby locations by distance");
-                            String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
-                            // Load all the allowed places
-                            AllowedPlacesRepository.getInstance(Objects.requireNonNull(application)).loadAllowedPlacesByLocation(locationString);
-                        }
-
-
-                    } else {
-                        Log.d(TAG, "Loading nearby locations");
-                        lastNearbyLocation = curLocation;
-                        String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
-                        // Load all the allowed places
-                        AllowedPlacesRepository.getInstance(Objects.requireNonNull(application)).loadAllowedPlacesByLocation(locationString);
-                    }
-
-
-                    SharedPreferences pref = application.getSharedPreferences("MyPref", 0); // 0 - for private mode
+                    SharedPreferences pref = application.getSharedPreferences("settings", 0); // 0 - for private mode
                     String deviceID = pref.getString("DeviceID", null);
                     if (deviceID != null) {
                         JSONObject jsonObject = new JSONObject();
@@ -122,28 +92,8 @@ public class Receiver extends BroadcastReceiver {
                 }
                 else
                     return;
-            }
-            else {
+            } else
                 curLocation = location;
-                if (lastNearbyLocation != null) {
-                    if (curLocation.distanceTo(lastNearbyLocation) > 200) { // TODO load near places. Do this with the location from the first time for example.
-                        lastNearbyLocation = curLocation;
-                        Log.d(TAG, "Loading nearby locations by distance");
-                        String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
-                        // Load all the allowed places
-                        AllowedPlacesRepository.getInstance(Objects.requireNonNull(application)).loadAllowedPlacesByLocation(locationString);
-                    }
-
-
-                } else {
-                    Log.d(TAG, "Loading nearby locations");
-                    lastNearbyLocation = curLocation;
-                    String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
-                    // Load all the allowed places
-                    AllowedPlacesRepository.getInstance(Objects.requireNonNull(application)).loadAllowedPlacesByLocation(locationString);
-                }
-            }
-
 
         }
 
@@ -200,8 +150,8 @@ public class Receiver extends BroadcastReceiver {
         }
 
         // Receive an update from AllowedPlaces topic
-        int allowedPlaces = intent.getIntExtra(MQTTClient.EXTRA_ALLOWED_PLACES_TYPES, 0);
-        if (allowedPlaces == 1) {
+        int allowedPlacesTypes = intent.getIntExtra(MQTTClient.EXTRA_ALLOWED_PLACES_TYPES, 0);
+        if (allowedPlacesTypes == 1) {
             Log.d(TAG, "Loading new allowed places types");
             AllowedPlacesTypeRepository.getInstance(this.application).loadAllAllowedPlacesTypes();
         }

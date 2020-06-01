@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.mqtt.R;
+import com.example.mqtt.data.repository.AllowedPlacesRepository;
 import com.example.mqtt.data.repository.NearbyDevicesRepository;
 import com.example.mqtt.model.AllowedPlaces;
 import com.example.mqtt.model.AllowedPlacesType;
@@ -41,12 +43,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
+import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -71,16 +75,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private NearbyDevicesViewModel nearbyDevicesViewModel;
 
-    private ArrayList<AllowedPlaces> allowedPlaces;
-
     private ArrayList<NearbyDevice> nearbyDevices;
 
     private TileOverlay mOverlay;
+
+    // Timer for nearby devices retrieval
+    private Timer timer;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         // Inflate the map fragment
         View root = inflater.inflate(R.layout.fragment_map, container, false);
+
+        timer = new Timer();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         if (mapFragment != null)
@@ -89,7 +96,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationReceiver = new LocationReceiver();
 
         allowedPlacesTypes = new ArrayList<>();
-        allowedPlaces = new ArrayList<>();
         nearbyDevices = new ArrayList<>();
 
         @SuppressWarnings("deprecation")
@@ -159,95 +165,124 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Location location = intent.getParcelableExtra(ForegroundService.EXTRA_LOCATION);
             if (location != null) {
                 if (curLocation != null) {
+                    setNearbyDevicesOnHeatMap();
                     if (curLocation.getLatitude() != location.getLatitude() && curLocation.getLongitude() != location.getLongitude()) {
                         curLocation = location;
+
                         if (lastNearbyLocation != null) {
                             if (curLocation.distanceTo(lastNearbyLocation) > 200) { // TODO load near places. Do this with the location from the first time for example.
                                 lastNearbyLocation = curLocation;
                                 Log.d(TAG, "New nearby places - by last near location");
 
-                                map.clear();
+                               // TODO hacer que activity no de null pointer al cambiar de pestaña
 
-                                //if (getActivity() != null) {
-                                    allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(Objects.requireNonNull(getActivity()), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
-                                    // allowedPlacesViewModel.getAllAllowedPlaces().observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
-
-                                    NearbyDevicesRepository.getInstance(getActivity().getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
-                                    nearbyDevicesViewModel.getNearbyDevices().observe(Objects.requireNonNull(getActivity()), allNearbyDevices -> nearbyDevices.addAll(allNearbyDevices));
-
-                                    addHeatMap(processNearbyDevices(nearbyDevices));
-
-                                    for (AllowedPlaces place : allowedPlaces) {
-                                        Location placeLocation = new Location("");
-                                        placeLocation.setLatitude(place.getGeo_lat());
-                                        placeLocation.setLongitude(place.getGeo_long());
-                                        if (curLocation.distanceTo(placeLocation) < 200) {
-                                            ArrayList<Object> taskParameters = new ArrayList<>();
-                                            taskParameters.add(place.getIcon());
-                                            taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
-                                            taskParameters.add(place.getName());
-                                            //noinspection unchecked
-                                            new IconLoaderTask().execute(taskParameters);
-
-                                        }
-                                    }
-                               // }
+                                setNearbyPlacesOnMap();
                             }
 
                         } else {
                             lastNearbyLocation = curLocation;
 
-                            map.clear();
-                           // if (getActivity() != null) {
-                                allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> allowedPlaces.addAll(allAllowedPlaces));
 
-                            NearbyDevicesRepository.getInstance(Objects.requireNonNull(getActivity()).getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
-                            nearbyDevicesViewModel.getNearbyDevices().observe(Objects.requireNonNull(getActivity()), allNearbyDevices -> nearbyDevices.addAll(allNearbyDevices));
-
-                            addHeatMap(processNearbyDevices(nearbyDevices));
-
-                                for (AllowedPlaces place : allowedPlaces) {
-                                    Log.d(TAG, "New nearby places");
-                                    Location placeLocation = new Location("");
-                                    location.setLatitude(place.getGeo_lat());
-                                    location.setLongitude(place.getGeo_long());
-                                    if (curLocation.distanceTo(placeLocation) < 200) {
-                                        Log.d(TAG, place.toString());
-                                        ArrayList<Object> taskParameters = new ArrayList<>();
-                                        taskParameters.add(place.getIcon());
-                                        taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
-                                        taskParameters.add(place.getName());
-                                        //noinspection unchecked
-                                        new IconLoaderTask().execute(taskParameters);
-                                    }
-                                }
-                          //  }
+                            setNearbyPlacesOnMap();
                         }
                     }
                     else
                         return;
-                } else
+                } else {
                     curLocation = location;
+                    lastNearbyLocation = location;
+                    setNearbyDevicesOnHeatMap();
+
+                    setNearbyPlacesOnMap();
+                }
 
                 map.setMyLocationEnabled(true);
             }
         }
     }
 
+
+    private void setNearbyPlacesOnMap(){
+        map.clear();
+
+        ArrayList<AllowedPlaces> allowedPlaces = new ArrayList<>();
+
+        Log.d(TAG, "Loading nearby locations by distance");
+        String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
+        // Load all the allowed places
+        AllowedPlacesRepository.getInstance(Objects.requireNonNull(requireActivity().getApplication())).loadAllowedPlacesByLocation(locationString);
+        allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> {
+            allowedPlaces.addAll(allAllowedPlaces);
+            addPlacesToMap(allowedPlaces);
+        });
+
+    }
+
+    private void addPlacesToMap(ArrayList<AllowedPlaces> allowedPlaces){
+        for (AllowedPlaces place : allowedPlaces) {
+            Log.d(TAG, "New nearby places");
+            Location placeLocation = new Location("");
+            placeLocation.setLatitude(place.getGeo_lat());
+            placeLocation.setLongitude(place.getGeo_long());
+            if (curLocation.distanceTo(placeLocation) < 200) {
+                Log.d(TAG, place.toString());
+                ArrayList<Object> taskParameters = new ArrayList<>();
+                taskParameters.add(place.getIcon());
+                taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
+                taskParameters.add(place.getName());
+                //noinspection unchecked
+                new IconLoaderTask().execute(taskParameters);
+            }
+        }
+    }
+
+
     private ArrayList<LatLng> processNearbyDevices(ArrayList<NearbyDevice> nearbyDevices){
         ArrayList<LatLng> nearbyDevicesLatLng = new ArrayList<>();
-
         for (NearbyDevice nearbyDevice : nearbyDevices)
             nearbyDevicesLatLng.add(new LatLng(nearbyDevice.getGeo_lat(), nearbyDevice.getGeo_long()));
-
         return nearbyDevicesLatLng;
     }
+
+    /**
+     * Set the nearby devices on the heat map
+     */
+
+    private void setNearbyDevicesOnHeatMap(){
+        Log.d(TAG, "Setting nearby devices on heat map");
+        NearbyDevicesRepository.getInstance(requireActivity().getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
+        nearbyDevicesViewModel.getNearbyDevices().observe(requireActivity(), allNearbyDevices -> {
+            nearbyDevices.clear();
+            nearbyDevices.addAll(allNearbyDevices);
+            addHeatMap(processNearbyDevices(nearbyDevices));
+        });
+    }
+
+
+    /**
+     *  Heat Map
+     */
+
+    private int[] colors = {
+            Color.rgb(102, 225, 0), // green
+            Color.rgb(255, 0, 0)    // red
+    };
+
+    private float[] startpoints = {
+            0.2f, 1f
+    };
 
     private void addHeatMap(ArrayList<LatLng> nearbyDevicesLatLng){
         // Create a heat map tile provider, passing it the latlngs of the police stations.
         if (!nearbyDevicesLatLng.isEmpty()) {
+            Gradient gradient = new Gradient(colors,startpoints);
+            int radius = 15;
+            double opacity = 0.4;
             TileProvider mProvider = new HeatmapTileProvider.Builder()
                     .data(nearbyDevicesLatLng)
+                    .gradient(gradient)
+                    .radius(radius)
+                    .opacity(opacity)
                     .build();
             // Add a tile overlay to the map, using the heat map tile provider.
             mOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
@@ -257,6 +292,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    /**
+     * Allowed Places Icon Loader
+     */
     @SuppressLint("StaticFieldLeak")
     class IconLoaderTask extends AsyncTask <ArrayList<Object>, String, Bitmap>
     {
