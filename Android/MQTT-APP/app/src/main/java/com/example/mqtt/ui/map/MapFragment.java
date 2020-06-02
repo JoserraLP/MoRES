@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -142,6 +143,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 allowedTypes.add(allowedPlacesType.getType());
         }
 
+/*
+        // Create the Handler object (on the main thread by default)
+        Handler handler = new Handler();
+        // Define the code block to be executed
+        Runnable runnableCode = new Runnable() { //TODO hacer que sea cada más tiempo
+            @Override
+            public void run() {
+                if (curLocation != null) {
+                    setNearbyDevicesOnHeatMap();
+                    handler.postDelayed(this, Constants.NEARBY_DEVICES_MILLIS_REQUEST);
+                }
+            }
+        };
+
+        // Start the initial runnable task by posting through the handler
+        handler.post(runnableCode);
+
+ */
     }
 
     @Override
@@ -168,11 +187,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     setNearbyDevicesOnHeatMap();
                     if (curLocation.getLatitude() != location.getLatitude() && curLocation.getLongitude() != location.getLongitude()) {
                         curLocation = location;
-
                         if (lastNearbyLocation != null) {
-                            if (curLocation.distanceTo(lastNearbyLocation) > 200) { // TODO load near places. Do this with the location from the first time for example.
+                            if (curLocation.distanceTo(lastNearbyLocation) > Constants.NEARBY_ALLOWED_PLACES_MIN_DISTANCE) {
                                 lastNearbyLocation = curLocation;
-                                Log.d(TAG, "New nearby places - by last near location");
 
                                // TODO hacer que activity no de null pointer al cambiar de pestaña
 
@@ -181,7 +198,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                         } else {
                             lastNearbyLocation = curLocation;
-
 
                             setNearbyPlacesOnMap();
                         }
@@ -192,7 +208,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     curLocation = location;
                     lastNearbyLocation = location;
                     setNearbyDevicesOnHeatMap();
-
                     setNearbyPlacesOnMap();
                 }
 
@@ -203,19 +218,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
     private void setNearbyPlacesOnMap(){
-        map.clear();
+        if (isAdded()) {
+            map.clear();
 
-        ArrayList<AllowedPlaces> allowedPlaces = new ArrayList<>();
+            ArrayList<AllowedPlaces> allowedPlaces = new ArrayList<>();
 
-        Log.d(TAG, "Loading nearby locations by distance");
-        String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
-        // Load all the allowed places
-        AllowedPlacesRepository.getInstance(Objects.requireNonNull(requireActivity().getApplication())).loadAllowedPlacesByLocation(locationString);
-        allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> {
-            allowedPlaces.addAll(allAllowedPlaces);
-            addPlacesToMap(allowedPlaces);
-        });
-
+            Log.d(TAG, "Loading nearby locations by distance");
+            String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
+            // Load all the allowed places
+            AllowedPlacesRepository.getInstance(Objects.requireNonNull(requireActivity().getApplication())).loadAllowedPlacesByLocation(locationString);
+            allowedPlacesViewModel.getAllAllowedPlacesByTypes(allowedTypes).observe(requireActivity(), allAllowedPlaces -> {
+                allowedPlaces.addAll(allAllowedPlaces);
+                addPlacesToMap(allowedPlaces);
+            });
+        }
     }
 
     private void addPlacesToMap(ArrayList<AllowedPlaces> allowedPlaces){
@@ -249,13 +265,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      */
 
     private void setNearbyDevicesOnHeatMap(){
-        Log.d(TAG, "Setting nearby devices on heat map");
-        NearbyDevicesRepository.getInstance(requireActivity().getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
-        nearbyDevicesViewModel.getNearbyDevices().observe(requireActivity(), allNearbyDevices -> {
-            nearbyDevices.clear();
-            nearbyDevices.addAll(allNearbyDevices);
-            addHeatMap(processNearbyDevices(nearbyDevices));
-        });
+        if (isAdded()) {
+            NearbyDevicesRepository.getInstance(requireActivity().getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
+            nearbyDevicesViewModel.getNearbyDevices().observe(requireActivity(), allNearbyDevices -> {
+                nearbyDevices.clear();
+                nearbyDevices.addAll(allNearbyDevices);
+                addHeatMap(processNearbyDevices(nearbyDevices));
+            });
+        }
     }
 
 
@@ -286,9 +303,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .build();
             // Add a tile overlay to the map, using the heat map tile provider.
             mOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-        } else
-            if (mOverlay != null)
-                mOverlay.remove();
+        }
 
     }
 

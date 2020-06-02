@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -26,6 +27,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.mqtt.data.repository.AllowedPlacesTypeRepository;
 import com.example.mqtt.data.repository.DeviceIDRepository;
 import com.example.mqtt.service.ForegroundService;
+import com.example.mqtt.ui.map.MapFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -99,6 +101,13 @@ public class DrawerActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+/*
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.map_fragment, new MapFragment());
+        ft.addToBackStack("tag_back");
+        ft.commit();
+
+ */
 
         // Check that the user hasn't revoked permissions by going to Settings.
         if (checkPermissions()) {

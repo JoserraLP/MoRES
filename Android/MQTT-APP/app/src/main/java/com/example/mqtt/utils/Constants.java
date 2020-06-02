@@ -12,9 +12,12 @@ public class Constants {
 
     public static String PLACES_API_CODE = "AJKnXv84fjrb0KIHawS0Tg";
 
-    public static int SIZE_PLACES_API_REQUEST = 20;
+    public static int SIZE_PLACES_API_REQUEST = 40;
 
     public static double NEARBY_DEVICES_RADIUS = 100;
 
+    public static long NEARBY_DEVICES_MILLIS_REQUEST = 1000;
+
+    public static int NEARBY_ALLOWED_PLACES_MIN_DISTANCE = 200;
 
 }

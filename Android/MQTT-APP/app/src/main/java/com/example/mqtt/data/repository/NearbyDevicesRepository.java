@@ -57,7 +57,6 @@ public class NearbyDevicesRepository {
     public void loadNearbyDevices(double lat, double lng, double radius) {
         Call<NearbyDevicesResponse> nearbyDeviceResponseCall = retrofit.getNearbyDevicesServiceAPI().getNearbyDevices(lat, lng, radius);
 
-
         nearbyDeviceResponseCall.enqueue(new Callback<NearbyDevicesResponse>() {
             @Override
             public void onResponse(@NonNull Call<NearbyDevicesResponse> call, @NonNull Response<NearbyDevicesResponse> response) {
