@@ -39,6 +39,9 @@ module.exports.getNearbyDevices = function(req, res, next) {
                     $maxDistance : req.rad.value,	
                     $minDistance : 0	
                 }	
+            },
+            "lastUpdate" : {
+                $gt : new Date(Date.now() - 1000 * 60 * 5) // 5 Minutes
             }	
         }	
 

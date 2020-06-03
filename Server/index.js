@@ -53,7 +53,7 @@ client.on('message', function(topic, message, packet){
         message = JSON.parse(message);
         var data = {
             $set : {
-                createdAt: new Date(),
+                lastUpdate: new Date(),
                 location: {
                     type: "Point",
                     coordinates: [message.geo_lat, message.geo_long]
