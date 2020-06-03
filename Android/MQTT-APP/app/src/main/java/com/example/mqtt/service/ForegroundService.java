@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -101,6 +102,8 @@ public class ForegroundService extends Service {
 
     private Receiver receiver;
 
+    private float batteryPct;
+
 
     public ForegroundService() {
     }
@@ -149,6 +152,27 @@ public class ForegroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service started");
 
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
+        assert batteryStatus != null;
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        batteryPct = level * 100 / (float)scale;
+
+        if (batteryPct > 70.0 || batteryPct == 0.0) {
+            Log.d(TAG, " Battery above 70%");
+            updateLocationRequest(1000, LocationRequest.PRIORITY_HIGH_ACCURACY);
+        } else if (batteryPct > 30.0) {
+            Log.d(TAG, " Battery above 30%");
+            updateLocationRequest(60 * 1000,  LocationRequest.PRIORITY_HIGH_ACCURACY);
+        } else if (batteryPct < 30.0){
+            Log.d(TAG, " Battery under 30%");
+            updateLocationRequest(2 * 60 * 1000, LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        }
+
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+
         // Tells the system to not try to recreate the service after it has been killed.
         return START_NOT_STICKY;
     }
@@ -177,7 +201,7 @@ public class ForegroundService extends Service {
         // and binds once again with this service. The service should cease to be a foreground
         // service when that happens.
         Log.i(TAG, "in onRebind()");
-        stopForeground(true);	        //stopForeground(true);
+        stopForeground(true);
         mChangingConfiguration = false;
         super.onRebind(intent);
     }
@@ -209,43 +233,13 @@ public class ForegroundService extends Service {
     public void requestLocationUpdates() {
         Log.i(TAG, "Requesting location updates");
             startService(new Intent(getApplicationContext(), ForegroundService.class));
+
             try {
                 mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                         mLocationCallback, Looper.myLooper());
             } catch (SecurityException unlikely) {
                 Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
             }
-    }
-
-    /**
-     * Returns the {@link NotificationCompat} used as part of the foreground service.
-     */
-    private Notification getNotification() {
-        Intent intent = new Intent(this, ForegroundService.class);
-
-        CharSequence text = Utils.getLocationText(mLocation);
-
-        // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
-        intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
-
-        // The PendingIntent to launch activity.
-        PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, DrawerActivity.class), 0);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .addAction(R.drawable.ic_launch, getString(R.string.launch_activity),
-                        activityPendingIntent)
-                .setContentText(text)
-                .setContentTitle(Utils.getLocationTitle(this))
-                .setOngoing(true)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setTicker(text)
-                .setWhen(System.currentTimeMillis());
-
-        // Set the Channel ID for Android O.
-        builder.setChannelId(CHANNEL_ID); // Channel ID
-
-        return builder.build();
     }
 
     private void getLastLocation() {
@@ -288,6 +282,45 @@ public class ForegroundService extends Service {
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    public void updateLocationRequest(long interval, int priority){
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(interval);
+        mLocationRequest.setFastestInterval(interval/2);
+        mLocationRequest.setPriority(priority);
+    }
+
+
+    /**
+     * Returns the {@link NotificationCompat} used as part of the foreground service.
+     */
+    private Notification getNotification() {
+        Intent intent = new Intent(this, ForegroundService.class);
+
+        CharSequence text = Utils.getLocationText(mLocation);
+
+        // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
+        intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
+
+        // The PendingIntent to launch activity.
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, DrawerActivity.class), 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .addAction(R.drawable.ic_launch, getString(R.string.launch_activity),
+                        activityPendingIntent)
+                .setContentText(text)
+                .setContentTitle(Utils.getLocationTitle(this))
+                .setOngoing(true)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setTicker(text)
+                .setWhen(System.currentTimeMillis());
+
+        // Set the Channel ID for Android O.
+        builder.setChannelId(CHANNEL_ID); // Channel ID
+
+        return builder.build();
     }
 
     /**

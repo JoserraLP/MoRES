@@ -5,11 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -18,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -94,20 +98,19 @@ public class DrawerActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_map, R.id.nav_news, R.id.nav_settings)
+                R.id.nav_map, R.id.nav_news, R.id.nav_filter ,R.id.nav_settings)
                 .setDrawerLayout(drawer)
                 .build();
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-/*
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.map_fragment, new MapFragment());
-        ft.addToBackStack("tag_back");
-        ft.commit();
 
- */
+
+        //TODO esto se ha hecho para comprobar si isAdded funciona bien pero no lo hace
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.nav_host_fragment, new Fragment());
+        ft.commit();
 
         // Check that the user hasn't revoked permissions by going to Settings.
         if (checkPermissions()) {
@@ -133,7 +136,7 @@ public class DrawerActivity extends AppCompatActivity {
         super.onResume();
         if (checkPermissions()) {
             requestPermissions();
-        } else { // TODO here start the service
+        } else {
             Log.d(TAG, "On resume with permissions");
             startService(new Intent(this, ForegroundService.class));
         }
@@ -226,7 +229,6 @@ public class DrawerActivity extends AppCompatActivity {
                 Log.i(TAG, "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission was granted.
-                startService(new Intent(this, ForegroundService.class));
                 mService.requestLocationUpdates();
             } else {
                 // Permission denied.
