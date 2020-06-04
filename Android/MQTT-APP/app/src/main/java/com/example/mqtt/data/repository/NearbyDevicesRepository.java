@@ -65,11 +65,14 @@ public class NearbyDevicesRepository {
                     assert nearbyDevicesResponse != null;
                     ArrayList<NearbyDevicesResponseItem> listNearbyDevices = nearbyDevicesResponse.getResults();
                     deviceID = pref.getString("DeviceID", null);
-                    for (NearbyDevicesResponseItem nearbyDevicesResponseItem : listNearbyDevices) {
+                    if (!listNearbyDevices.isEmpty())
+                        for (NearbyDevicesResponseItem nearbyDevicesResponseItem : listNearbyDevices) {
                         Log.d(TAG, nearbyDevicesResponseItem.get_id());
                         if(deviceID != null && !deviceID.equals(nearbyDevicesResponseItem.get_id()))
                             insertNearbyDevice(processResponseItem(nearbyDevicesResponseItem));
-                    }
+                        }
+                    else
+                        clearNearbyDevices();
                 }
             }
 
@@ -83,6 +86,11 @@ public class NearbyDevicesRepository {
     private void insertNearbyDevice(NearbyDevice nearbyDevice){
         this.nearbyDevices.add(nearbyDevice);
         Log.d(TAG, "Added nearby device " + nearbyDevice.toString());
+    }
+
+    private void clearNearbyDevices(){
+        this.nearbyDevices.clear();
+        Log.d(TAG, "Clearing nearby devices");
     }
 
     public LiveData<List<NearbyDevice>> getNearbyDevices(){

@@ -69,9 +69,13 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Vi
     public void addAllowedPlacesTypeList (List<AllowedPlacesType> allowedPlacesTypesList) {
         data.clear();
         data.addAll(allowedPlacesTypesList);
+        data.sort((o1, o2) -> o1.getTitle().compareTo(o2.getTitle()));
         notifyDataSetChanged();
     }
 
+    public void translateText(String text){
+
+    }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private Switch allowedPlacesTypeSwitch;

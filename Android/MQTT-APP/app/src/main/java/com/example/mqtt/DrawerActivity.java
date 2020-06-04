@@ -35,6 +35,7 @@ import com.example.mqtt.ui.map.MapFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+
 import java.util.Locale;
 
 public class DrawerActivity extends AppCompatActivity {
@@ -89,6 +90,7 @@ public class DrawerActivity extends AppCompatActivity {
         if (!languageCode.equals(Locale.getDefault().getLanguage()))
             putLanguage(languageCode);
 
+
         setContentView(R.layout.activity_drawer);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -106,11 +108,13 @@ public class DrawerActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-
+/*
         //TODO esto se ha hecho para comprobar si isAdded funciona bien pero no lo hace
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.nav_host_fragment, new Fragment());
         ft.commit();
+
+ */
 
         // Check that the user hasn't revoked permissions by going to Settings.
         if (checkPermissions()) {

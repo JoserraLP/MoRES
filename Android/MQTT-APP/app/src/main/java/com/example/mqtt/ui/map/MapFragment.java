@@ -1,5 +1,6 @@
 package com.example.mqtt.ui.map;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,10 +21,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.example.mqtt.DrawerActivity;
 import com.example.mqtt.R;
 import com.example.mqtt.data.repository.AllowedPlacesRepository;
 import com.example.mqtt.data.repository.NearbyDevicesRepository;
@@ -39,11 +44,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
@@ -51,7 +58,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -80,15 +86,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private TileOverlay mOverlay;
 
-    // Timer for nearby devices retrieval
-    private Timer timer;
+    private AsyncTask iconLoaderTask;
+
+    private ArrayList<AllowedPlaces> allowedPlaces;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+        Log.d(TAG, "onCreateView");
         // Inflate the map fragment
         View root = inflater.inflate(R.layout.fragment_map, container, false);
-
-        timer = new Timer();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         if (mapFragment != null)
@@ -97,24 +104,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationReceiver = new LocationReceiver();
 
         allowedPlacesTypes = new ArrayList<>();
+        allowedPlaces = new ArrayList<>();
         nearbyDevices = new ArrayList<>();
-
-        @SuppressWarnings("deprecation")
-        AllowedPlacesTypeViewModel allowedPlacesTypeViewModel = ViewModelProviders.of(requireActivity()).get(AllowedPlacesTypeViewModel.class);
 
         //noinspection deprecation
         allowedPlacesViewModel = ViewModelProviders.of(requireActivity()).get(AllowedPlacesViewModel.class);
 
-        allowedPlacesTypeViewModel.getAllAllowedPlacesType().observe(requireActivity(), allAllowedPlacesType -> allowedPlacesTypes.addAll(allAllowedPlacesType));
-
         //noinspection deprecation
         nearbyDevicesViewModel = ViewModelProviders.of(requireActivity()).get(NearbyDevicesViewModel.class);
+
+        @SuppressWarnings("deprecation")
+        AllowedPlacesTypeViewModel allowedPlacesTypeViewModel = ViewModelProviders.of(requireActivity()).get(AllowedPlacesTypeViewModel.class);
+
+        allowedPlacesTypeViewModel.getAllAllowedPlacesType().observe(requireActivity(), allAllowedPlacesType -> allowedPlacesTypes.addAll(allAllowedPlacesType));
 
         return root;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
 
         // Get the map fragment
@@ -125,6 +134,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
 
         // Register Location receiver
@@ -137,10 +147,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mapFragment.getMapAsync(this);
 
         allowedTypes = new ArrayList<>();
+        allowedPlaces = new ArrayList<>();
 
         for (AllowedPlacesType allowedPlacesType : allowedPlacesTypes){
             if (allowedPlacesType.isChecked())
                 allowedTypes.add(allowedPlacesType.getType());
+        }
+
+        if (curLocation != null) {
+            map.setMyLocationEnabled(true);
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()), zoom));
         }
 
 /*
@@ -165,8 +181,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "onMapReady");
         // Save the map instance
         map = googleMap;
+        map.getUiSettings().setZoomControlsEnabled(true);
 
         if (curLocation != null) {
             map.setMyLocationEnabled(true);
@@ -191,14 +209,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             if (curLocation.distanceTo(lastNearbyLocation) > Constants.NEARBY_ALLOWED_PLACES_MIN_DISTANCE) {
                                 lastNearbyLocation = curLocation;
 
-                               // TODO hacer que activity no de null pointer al cambiar de pestaña
-
                                 setNearbyPlacesOnMap();
                             }
 
                         } else {
                             lastNearbyLocation = curLocation;
-
                             setNearbyPlacesOnMap();
                         }
                     }
@@ -221,7 +236,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (isAdded()) {
             map.clear();
 
-            ArrayList<AllowedPlaces> allowedPlaces = new ArrayList<>();
+            allowedPlaces = new ArrayList<>();
 
             Log.d(TAG, "Loading nearby locations by distance");
             String locationString = curLocation.getLatitude() + "," + curLocation.getLongitude();
@@ -247,7 +262,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 taskParameters.add(new LatLng(place.getGeo_lat(), place.getGeo_long()));
                 taskParameters.add(place.getName());
                 //noinspection unchecked
-                new IconLoaderTask().execute(taskParameters);
+                iconLoaderTask = new IconLoaderTask().execute(taskParameters);
             }
         }
     }
@@ -282,7 +297,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private int[] colors = {
             Color.rgb(102, 225, 0), // green
-            Color.rgb(255, 0, 0)    // red
+            Color.rgb(255, 165, 0)    // red
     };
 
     private float[] startpoints = {
@@ -292,6 +307,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void addHeatMap(ArrayList<LatLng> nearbyDevicesLatLng){
         // Create a heat map tile provider, passing it the latlngs of the police stations.
         if (!nearbyDevicesLatLng.isEmpty()) {
+            if (mOverlay != null) {
+                mOverlay.remove();
+            }
+
             Gradient gradient = new Gradient(colors,startpoints);
             int radius = 15;
             double opacity = 0.4;
@@ -303,6 +322,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .build();
             // Add a tile overlay to the map, using the heat map tile provider.
             mOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+
         }
 
     }
