@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.mqtt">
+    package="com.unex.tfg">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality.
     -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- MQTT connection -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- Location Service -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- WiFi Service -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -34,7 +37,7 @@
         <!-- Declare all the activities -->
 
         <activity
-            android:name=".DrawerActivity"
+            android:name="com.unex.tfg.DrawerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,7 +64,7 @@
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
         <service
-            android:name=".service.ForegroundService"
+            android:name="com.unex.tfg.service.ForegroundService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location"
@@ -69,8 +72,8 @@
 
         <!-- Declare all the receivers -->
 
-        <receiver android:name=".ui.map.MapFragment$LocationReceiver"/>
-        <receiver android:name=".receiver.Receiver"/>
+        <receiver android:name="com.unex.tfg.ui.map.view.MapFragment$LocationReceiver"/>
+        <receiver android:name="com.unex.tfg.receiver.Receiver"/>
     </application>
 
 </manifest>

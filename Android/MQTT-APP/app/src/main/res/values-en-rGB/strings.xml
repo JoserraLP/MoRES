@@ -30,6 +30,7 @@
     <string name="allowed_places_type_image">Allowed Places Types Icon</string>
     <string name="news_date">01/01/2020</string>
 
+    <string name="request_permission_toast_msg">Location permission is needed for core functionality</string>
 
     <string-array name="languages_array">
         <item>English</item>

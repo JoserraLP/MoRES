@@ -2,8 +2,13 @@
   <dictionary name="jose_">
     <words>
       <w>discon</w>
+      <w>español</w>
+      <w>geocoder</w>
+      <w>ifilter</w>
+      <w>inglés</w>
       <w>mqtt</w>
       <w>paho</w>
+      <w>startpoints</w>
     </words>
   </dictionary>
 </component>

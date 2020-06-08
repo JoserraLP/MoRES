@@ -29,6 +29,8 @@
     <string name="allowed_places_type_image">Icono de tipos de lugares permitidos</string>
     <string name="news_date">01/01/2020</string>
 
+    <string name="request_permission_toast_msg">Los permisos de localizacion son necesarios para el funcionamiento de la aplicación</string>
+
 
     <string-array name="languages_array">
         <item>Español</item>

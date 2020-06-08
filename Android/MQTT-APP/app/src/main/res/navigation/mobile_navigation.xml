@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_map"
-        android:name="com.example.mqtt.ui.map.MapFragment"
+        android:name="com.unex.tfg.ui.map.view.MapFragment"
         android:label="@string/menu_map"
         tools:layout="@layout/fragment_map">
 
@@ -26,7 +26,7 @@
 
     <fragment
         android:id="@+id/nav_news"
-        android:name="com.example.mqtt.ui.news.view.NewsFragment"
+        android:name="com.unex.tfg.ui.news.view.NewsFragment"
         android:label="@string/menu_news"
         tools:layout="@layout/fragment_news" >
         <action
@@ -36,20 +36,20 @@
 
     <fragment
         android:id="@+id/nav_news_item"
-        android:name="com.example.mqtt.ui.news.view.NewsItemFragment"
+        android:name="com.unex.tfg.ui.news.view.NewsItemFragment"
         android:label="@string/menu_news"
         tools:layout="@layout/fragment_news_info" >
     </fragment>
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.example.mqtt.ui.settings.SettingsFragment"
+        android:name="com.unex.tfg.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" />
 
     <fragment
         android:id="@+id/nav_filter"
-        android:name="com.example.mqtt.ui.filter.view.FilterFragment"
+        android:name="com.unex.tfg.ui.filter.view.FilterFragment"
         android:label="@string/menu_filter"
         tools:layout="@layout/fragment_filter" />
 </navigation>
