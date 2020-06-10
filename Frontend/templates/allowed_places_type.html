@@ -1,0 +1,26 @@
+<!doctype html>
+<head>
+  <title>Allowed Places Types</title>
+</head>
+<body>
+  <h1>Allowed Places Types</h1>
+  {% if results %}
+    <form action="{{url_for('allowed_places_types')}}" method="POST">
+      <table>
+        {% for item in results %}
+        <tr>
+          <td><img src="{{item['icon']}}" width="30" height="30"></td>
+          {% if item['isChecked'] %}
+          <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['id']}}" checked><label>{{ item['title'] }}</label></td>
+          {% else %}
+          <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['id']}}"><label>{{ item['title'] }}</label></td>
+          {% endif %}
+        <p>
+        {% endfor %}
+      </table>
+      <input type="submit" value="Enviar">
+    </form>
+  {% else %}
+    <p>Allowed places types cannot be loaded, please refresh the page</p>
+  {% endif %}
+</body>
