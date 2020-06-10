@@ -4,17 +4,19 @@
 var mongoClient = require('mongodb').MongoClient;
 var mongoURL = "mongodb://localhost:27017/"
 
-// DB and Collection creation
-/*
-mongoClient.connect(mongoURL, function(err, db) {
-    if (err) throw err;
-    var dbase = db.db("tfg");
-    dbase.createCollection("allowed_places_types", function(err, res){
-        if (err) throw err;
-    });
-    dbase.collection("allowed_places_types").createIndex({"type": 1}, {unique : true});
-}); 
-*/
+// MQTT
+var mqtt = require('mqtt')
+var mqttClient = mqtt.connect('mqtt://192.168.1.83')
+
+mqttClient.on("connect", function(){
+    console.log("Connected to MQTT Broker");
+});
+
+mqttClient.on("error",function(error){
+    console.log("Can't connect" + error);
+    process.exit(1);
+});
+
 
 /**
  * Delete the allowed place type.
@@ -87,23 +89,21 @@ module.exports.postAllowedPlaceType = function(req, res, next) {
     mongoClient.connect(mongoURL, function(err, db) {
         if (err) throw err;
         var dbase = db.db("tfg");
-        var data = {
-            type: req.undefined.value.type,
-            title: req.undefined.value.title,
-            icon: req.undefined.value.icon
-        }
-        dbase.collection("allowed_places_types").insertOne(data, function(err, response) {
-            if (err) {
-                res.statusCode = 409 
-                res.send({
-                    message: "The allowed place with type " + req.undefined.value.type + " already exists"
-                })
-                throw err;
-            }
+        var data = req.undefined.value
+
+        dbase.collection("allowed_places_types").deleteMany({});
+
+        dbase.collection("allowed_places_types").insertMany(data, function(err, response) {
+            if (err) throw err;
+
             res.send({
-                message: "Allowed place with type " + req.undefined.value.type + " succesfully added"
+                message: "Allowed places types updated"
             });
-            console.log("Allowed place with type" + req.undefined.value.type + " succesfully added");
+
+            if (mqttClient.connected){
+                mqttClient.publish('AllowedPlacesTypes', "1");
+                console.log("Allowed places types updated");
+            }
         }); 
     });
 };

@@ -89,8 +89,10 @@ paths:
       requestBody:
         content:
           application/json:
-            schema: 
-              $ref: '#/components/schemas/AllowedPlacesType'
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/AllowedPlacesType'
         required: true
       responses:
         201:
