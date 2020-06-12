@@ -12,6 +12,22 @@ app = Flask(__name__)
 def index():
     return 'Index Page'
 
+def process_nearby_devices(nearby_devices):
+    nearby_devices_processed = []
+    for item in nearby_devices:
+        coordinates = item['location']['coordinates']
+        nearby_devices_processed.append((coordinates[1], coordinates[0]))
+    return nearby_devices_processed
+
+@app.route('/map')
+def map():
+    try:
+        params = {'lat': -6.9706100, 'lng': 38.8778900, 'rad': 1000000000}
+
+        return render_template('map.html', data=params)
+    except requests.exceptions.RequestException as e:    
+        raise SystemExit(e)
+
 @app.route('/allowed_places_types', methods=['GET', 'POST'])
 def allowed_places_types():
     if request.method == 'POST':
@@ -54,9 +70,9 @@ def select_allowed_places_types(request):
         parsed_selected = parse_selected(request.form.getlist("allowed_places_types"))
 
         requests.post(SERVER_API_URL + '/allowed_places_types', json=parsed_selected)
-        return render_template('allowed_places_type.html', results=parsed_selected)
+        return "Successful"
     except requests.exceptions.RequestException as e:    
         raise SystemExit(e)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="192.168.1.83")
