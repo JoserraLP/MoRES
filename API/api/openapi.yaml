@@ -274,6 +274,14 @@ paths:
         schema:
           type: number
         style: form
+      - description: response body type 
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
       responses:
         201:
           content:

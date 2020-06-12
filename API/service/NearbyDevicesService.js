@@ -39,18 +39,44 @@ module.exports.getNearbyDevices = function(req, res, next) {
                     $maxDistance : req.rad.value,	
                     $minDistance : 0	
                 }	
-            },
+            }/*,
             "lastUpdate" : {
                 $gt : new Date(Date.now() - 1000 * 60 * 5) // 5 Minutes
-            }	
+            }	*/
         }	
 
         dbase.collection("device").find(query).toArray(function(err, result) {
             if (err) throw err;
             console.log("Nearby devices: " + JSON.stringify(result));	
+            // To avoid frontend CORS error
+            res.setHeader('Access-Control-Allow-Origin', 'http://192.168.1.83:5000');
+            
+            if (req.type.value && req.type.value == 'geojson'){
+                var featuresData = [];
+                for (var key in result){
+                    featuresData.push({
+                        "type": "Feature",
+                        "properties": {
+                            "id": result[key]._id
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                result[key].location.coordinates[1], //Lng
+                                result[key].location.coordinates[0] //Lat
+                            ]
+                        }
+                    });
+                }
+                res.send({
+                    type: "FeatureCollection",
+                    features: featuresData
+                });
+            } else {
                 res.send({	
-                    results: result	
-            });
+                    results: result
+                })
+            };	
         });
     });
 };
