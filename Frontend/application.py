@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
+from flask_mqtt import Mqtt
 
+import json
 import requests
 import ast
 
@@ -8,16 +10,21 @@ PLACES_API_URL = "https://places.demo.api.here.com/places/v1/categories/places/?
 
 app = Flask(__name__)
 
+# -------------- MQTT -------------- #
+
+app.config['MQTT_BROKER_URL'] = '192.168.1.83'
+app.config['MQTT_BROKER_PORT'] = 1883
+mqtt = Mqtt(app)
+
+@mqtt.on_connect()
+def handle_connect(client, userdata, flags, rc):
+    print("Connected to MQTT")
+
 @app.route('/')
 def index():
     return 'Index Page'
 
-def process_nearby_devices(nearby_devices):
-    nearby_devices_processed = []
-    for item in nearby_devices:
-        coordinates = item['location']['coordinates']
-        nearby_devices_processed.append((coordinates[1], coordinates[0]))
-    return nearby_devices_processed
+# -------------- Map -------------- #
 
 @app.route('/map')
 def map():
@@ -27,6 +34,29 @@ def map():
         return render_template('map.html', data=params)
     except requests.exceptions.RequestException as e:    
         raise SystemExit(e)
+
+# -------------- News -------------- #
+
+def create_news_item(request):
+    try: 
+        # Get data from request
+        data = request.form.to_dict()
+        data['relevance'] = int(data['relevance'])
+        payload = json.dumps(data)
+        # MQTT send news item
+        mqtt.publish('News', payload)
+        return "Successful"
+    except requests.exceptions.RequestException as e:    
+        raise SystemExit(e)
+
+@app.route('/add_news', methods=['GET', 'POST'])
+def add_news():
+    if request.method == 'POST':
+        return create_news_item(request)
+    else:
+        return render_template('add_news_item.html')
+
+# -------------- Allowed Places Types -------------- #
 
 @app.route('/allowed_places_types', methods=['GET', 'POST'])
 def allowed_places_types():
