@@ -1,70 +1,70 @@
-<!doctype html>
-<head>
-    <title>Map</title>
+{% extends "base.html" %}
 
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" />
+{% block header %}
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.0.6/dist/MarkerCluster.Default.css" />
 
-    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-</head>
-<body>
-    <div id="map" style="height: 500px; width: 600px;"></div>
-    <script src="https://unpkg.com/leaflet@1.1.0/dist/leaflet-src.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js"></script>
-    <script src="https://unpkg.com/leaflet.featuregroup.subgroup"></script>
-    <script src="{{url_for('static', filename='leaflet-realtime.js')}}"></script>
-    <script>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+{% endblock %}
 
-        var popup = L.popup();
+{% block content %}
+<div id="map" style="height: 500px; width: 600px;"></div>
+<script src="https://unpkg.com/leaflet@1.1.0/dist/leaflet-src.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.0.6/dist/leaflet.markercluster-src.js"></script>
+<script src="https://unpkg.com/leaflet.featuregroup.subgroup"></script>
+<script src="{{url_for('static', filename='leaflet-realtime.js')}}"></script>
+<script>
 
-        var map = L.map('map').setView(['{{data["lng"]}}', '{{data["lat"]}}'], 10);
+    var popup = L.popup();
 
-        L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-            maxZoom: 18
-        }).addTo(map);
+    var map = L.map('map').setView(['{{data["lng"]}}', '{{data["lat"]}}'], 10);
 
-        var url = 'http://192.168.1.83:8080/nearby_devices?lat={{data["lat"]}}&lng={{data["lng"]}}&rad={{data["rad"]}}&type=geojson' 
+    L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+        maxZoom: 18
+    }).addTo(map);
 
-        var realtime = L.realtime(url, {
-            interval: 3 * 1000,
-            getFeatureId: function(f) {
-                return f.properties.id;
-            },
-            cache: true,
-            onEachFeature(f, l) {
-                l.bindPopup(function() {
-                    return '<h3>' + f.properties.id + '</h3>';
-                });
-            },
-            pointToLayer: function (feature, latlng) {
-                return L.marker(latlng, {
-                    'icon': L.icon({
-                        iconUrl: "../static/marker-icon.png",
-                        shadowUrl: "../static/marker-shadow.png"
-                })
+    var url = 'http://192.168.1.83:8080/nearby_devices?lat={{data["lat"]}}&lng={{data["lng"]}}&rad={{data["rad"]}}&type=geojson' 
+
+    var realtime = L.realtime(url, {
+        interval: 3 * 1000,
+        getFeatureId: function(f) {
+            return f.properties.id;
+        },
+        cache: true,
+        onEachFeature(f, l) {
+            l.bindPopup(function() {
+                return '<h3>' + f.properties.id + '</h3>';
             });
-            }
-        }).addTo(map);
-
-        L.control.layers(null, {
-            'Realtime Layer': realtime
-        }).addTo(map);
-
-        realtime.on('update', function() {
-            map.fitBounds(realtime.getBounds());
+        },
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, {
+                'icon': L.icon({
+                    iconUrl: "../static/marker-icon.png",
+                    shadowUrl: "../static/marker-shadow.png"
+            })
         });
-
-        function onMapClick(e) {
-            popup
-            .setLatLng(e.latlng)
-            .setContent("You clicked the map at " + e.latlng.toString())
-            .openOn(map);
         }
+    }).addTo(map);
 
-        map.on('click', onMapClick);
+    L.control.layers(null, {
+        'Realtime Layer': realtime
+    }).addTo(map);
 
-    </script>
+    realtime.on('update', function() {
+        map.fitBounds(realtime.getBounds());
+    });
+
+    function onMapClick(e) {
+        popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+    }
+
+    map.on('click', onMapClick);
+
+</script>
     
-</body>
+{% endblock %}

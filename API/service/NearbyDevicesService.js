@@ -50,6 +50,7 @@ module.exports.getNearbyDevices = function(req, res, next) {
             console.log("Nearby devices: " + JSON.stringify(result));	
             // To avoid frontend CORS error
             res.setHeader('Access-Control-Allow-Origin', 'http://192.168.1.83:5000');
+            res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
             
             if (req.type.value && req.type.value == 'geojson'){
                 var featuresData = [];
