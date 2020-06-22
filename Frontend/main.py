@@ -1,14 +1,31 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, jsonify, url_for, redirect
 from flask_login import login_required, current_user
-from . import db, SERVER_API_URL, PLACES_API_URL
+from flask_user import roles_required
 
-from flask_mqtt import Mqtt
+
+from . import db, mqtt, SERVER_API_URL, PLACES_API_URL
 
 import json
 import requests
 import ast
 
+radius_role = {
+    'admin': 10000000000,
+    'politician_country': 10000000000,
+    'politician_admin_area': 1000000,
+    'politician_locality': 10000
+}
+
 main = Blueprint('main', __name__)
+
+def get_cur_location(ip_address):
+    try:
+        response = requests.get("http://ip-api.com/json/{}".format(ip_address))
+        location = response.json()
+        return location
+    except Exception as e:
+        return "Unknown"
+
 
 @main.route('/')
 def index():
@@ -25,11 +42,31 @@ def profile():
 @login_required
 def map():
     try:
-        params = {'lat': -6.9706100, 'lng': 38.8778900, 'rad': 1000000000}
+        ip_address = request.remote_addr
+        cur_location = get_cur_location(ip_address)
 
-        return render_template('map.html', data=params)
+        if cur_location['status'] != 'fail':
+            user_roles = current_user.get_roles()
+
+            params = {'lat': cur_location['lat'], 'lng': cur_location['lon'], 'rad': radius_role[user_roles[0]]}
+            
+            #TODO make the map with the location of the user
+            return render_template('map.html', data=params)
+            
+        else:
+            # Static if IP could not be loaded
+            params = {'lat': -6.9706100, 'lng': 38.8778900, 'rad': 1000000000}
+
+            return render_template('map.html', data=params)
     except requests.exceptions.RequestException as e:    
         raise SystemExit(e)
+
+@main.route('/send_patrol', methods=['POST'])
+def send_patrol():
+    data = request.form.to_dict()
+    payload = json.dumps(data)
+    mqtt.publish("Patrol", payload)
+    return redirect(url_for('main.map'))
 
 # -------------- News -------------- #
 
@@ -73,11 +110,11 @@ def retrieve_allowed_places_types(results=None):
         results = r_places_api.json()['items']
         r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types')
         server_results = r_server_api.json()['results']
-        
+
         check_results(results, server_results)
 
         return render_template('allowed_places_type.html', results=results)
-    except requests.exceptions.RequestException as e:    
+    except:    
         flash('Error, the allowed places types could not be loaded')
         return render_template('allowed_places_type.html', results=results)
     

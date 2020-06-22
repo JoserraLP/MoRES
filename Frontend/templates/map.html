@@ -16,7 +16,6 @@
 <script src="{{url_for('static', filename='leaflet-realtime.js')}}"></script>
 <script>
 
-    var popup = L.popup();
 
     var map = L.map('map').setView(['{{data["lng"]}}', '{{data["lat"]}}'], 10);
 
@@ -48,6 +47,25 @@
         }
     }).addTo(map);
 
+    var popup = L.popup();
+
+    function onMapClick(e) {
+        latValue = e.latlng.lat;
+        lngValue = e.latlng.lng;
+        
+        popup
+        .setLatLng(e.latlng)
+        .setContent('<form id="popup-form" action="{{url_for("main.send_patrol")}}" method="POST">\
+                        <input type="hidden" id="lat" name="lat" value='+latValue+'>\
+                        <input type="hidden" id="lng" name="lng" value='+lngValue+'>\
+                        <button id="button-submit" type="submit">Send patrol</button>\
+                    </form>')
+        .openOn(map);
+    };
+
+    map.on('click', onMapClick);
+
+
     L.control.layers(null, {
         'Realtime Layer': realtime
     }).addTo(map);
@@ -55,15 +73,6 @@
     realtime.on('update', function() {
         map.fitBounds(realtime.getBounds());
     });
-
-    function onMapClick(e) {
-        popup
-        .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + e.latlng.toString())
-        .openOn(map);
-    }
-
-    map.on('click', onMapClick);
 
 </script>
     
