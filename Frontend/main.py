@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, jsonify, url_for, 
 from flask_login import login_required, current_user
 from flask_user import roles_required
 
-from .constants import SERVER_API_URL, PLACES_API_URL
+from .static.constants import SERVER_API_URL, PLACES_API_URL
 
 from . import db, mqtt
 
