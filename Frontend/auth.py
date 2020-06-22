@@ -32,35 +32,6 @@ def login():
     else:
         return render_template('login.html')
 
-# -------------- Sign up -------------- #
-
-def do_sign_up(request):
-    email = request.form.get('email')
-    name = request.form.get('name')
-    password = request.form.get('password')
-
-    user = User.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
-
-    if user: # if a user is found, we want to redirect back to signup page so user can try again
-        flash('Email address already exists') # Message
-        return redirect(url_for('auth.signup'))
-
-    # create new user with the form data.
-    new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
-
-    # add the new user to the database
-    db.session.add(new_user)
-    db.session.commit()
-
-    return redirect(url_for('auth.login'))
-
-@auth.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
-        return do_sign_up(request)
-    else:
-        return render_template('signup.html')
-
 # -------------- Logout -------------- #
 
 @auth.route('/logout')
