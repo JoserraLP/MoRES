@@ -358,7 +358,7 @@ components:
           example: icon.png
           type: string
         is_allowed:
-          example: 0 # not allowed
+          example: true # allowed
           type: boolean
         country:
           example: [Spain, France]
