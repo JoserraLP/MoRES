@@ -75,6 +75,7 @@ app.use(bodyParser.json({
 }));
 var oasTools = require('oas-tools');
 var jsyaml = require('js-yaml');
+const { parse } = require('path');
 var serverPort = 8080;
 
 var spec = fs.readFileSync(path.join(__dirname, '/api/openapi.yaml'), 'utf8');
@@ -89,6 +90,50 @@ var options_object = {
 };
 
 oasTools.configure(options_object);
+
+// Load all allowed places types from the external API
+mongoClient.connect(mongoURL, function(err, db) {
+    if (err) throw err;
+    var allowed_places_types_api = 'https://places.demo.api.here.com/places/v1/categories/places/?app_id=DemoAppId01082013GAL&app_code=AJKnXv84fjrb0KIHawS0Tg#'
+    var dbase = db.db("tfg");
+    
+    dbase.collection("allowed_places_types").countDocuments(function (err, count){
+        if (err) throw err;
+        if (count === 0){
+            var results = []
+            https.get(allowed_places_types_api, (resp) => {
+                let data = '';
+
+                // A chunk of data has been recieved.
+                resp.on('data', (chunk) => {
+                    data += chunk;
+                });
+
+                // The whole response has been received. Print out the result.
+                resp.on('end', () => {
+                    JSON.parse(data)['items'].forEach(element => {
+                        let item = {
+                            "type": element.id,
+                            "title": element.title,
+                            "icon": element.icon,
+                            "is_allowed": false,
+                            "country": [],
+                            "admin_area": [],
+                            "locality": []
+                        };
+                        dbase.collection("allowed_places_types").insertOne(item, function(err, res) {
+                            if (err) throw err;
+                        });
+                    });
+                    db.close();
+                });
+
+                }).on("error", (err) => {
+                    console.log("Error: " + err.message);
+            });
+        }
+    });
+});
 
 oasTools.initialize(oasDoc, app, function() {
     http.createServer(app).listen(serverPort, function() {
