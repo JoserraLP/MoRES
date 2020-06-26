@@ -343,7 +343,7 @@ components:
         type: restaurant
         title: Restaurant
         icon: icon.png
-        is_allowed: 0
+        is_allowed: true
         country: [Spain, France]
         admin_area: [Extremadura, Andalucia]
         locality: [Caceres, Badajoz]
@@ -359,7 +359,7 @@ components:
           type: string
         is_allowed:
           example: 0 # not allowed
-          type: integer
+          type: boolean
         country:
           example: [Spain, France]
           type: array
