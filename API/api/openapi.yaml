@@ -343,6 +343,10 @@ components:
         type: restaurant
         title: Restaurant
         icon: icon.png
+        is_allowed: 0
+        country: [Spain, France]
+        admin_area: [Extremadura, Andalucia]
+        locality: [Caceres, Badajoz]
       properties:
         type:
           example: restaurant
@@ -353,4 +357,22 @@ components:
         icon:
           example: icon.png
           type: string
+        is_allowed:
+          example: 0 # not allowed
+          type: integer
+        country:
+          example: [Spain, France]
+          type: array
+          items:
+              type: string
+        admin_area:
+          example: [Extremadura, Andalucia]
+          type: array
+          items:
+              type: string
+        locality:
+          example: [Caceres, Badajoz]
+          type: array
+          items:
+              type: string
       type: object
