@@ -4,8 +4,7 @@ from flask_user import roles_required
 
 from .static.constants import SERVER_API_URL, PLACES_API_URL
 
-from . import db, mqtt
-
+from . import db, mqtt, geolocator
 
 import json
 import requests
@@ -100,20 +99,38 @@ def allowed_places_types():
     else:
         return retrieve_allowed_places_types()
 
-def check_results(results, server_results):
+def check_places_by_user_location(results, user_location, user_roles):
     for elem in results:
-        for server_elem in server_results:
-            if elem['id'] == server_elem['type']:
-                elem['isChecked'] = True
+        if 'admin' in user_roles or 'politician_country' in user_roles:
+            for country in elem['country']:
+                if user_location == country:
+                    elem['is_allowed'] = True
+        elif 'politician_admin_area' in user_roles:
+            for admin_area in elem['admin_area']:
+                if user_location == admin_area:
+                    results['is_allowed'] = True
+        elif 'politician_locality' in user_roles or 'police' in user_roles:
+            for locality in elem['locality']:
+                if user_location == locality:
+                    results['is_allowed'] = True
+    return results
+                    
+
 
 def retrieve_allowed_places_types(results=None):
     try:
-        r_places_api = requests.get(PLACES_API_URL)
-        results = r_places_api.json()['items']
-        r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types')
-        server_results = r_server_api.json()['results']
+        user_roles = [role.name for role in current_user.roles]
+        
+        if 'politician_country' in user_roles or 'admin' in user_roles:
 
-        check_results(results, server_results)
+            r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types')
+
+            results = check_places_by_user_location(r_server_api.json()['results'], current_user.location, user_roles)
+
+        elif 'politician_admin_area' in user_roles:
+            pass
+        elif 'politician_locality' in user_roles or 'police' in user_roles:
+            pass
 
         return render_template('allowed_places_type.html', results=results)
     except:    
@@ -125,17 +142,56 @@ def parse_selected(selected):
     for item in selected:
         item = ast.literal_eval(item)
         selected_item = dict()
-        selected_item['type'] = item['id']
+        selected_item['type'] = item['type']
         selected_item['title'] = item['title']
         selected_item['icon'] = item['icon']
+        selected_item['country'] = item['country']
+        selected_item['admin_area'] = item['admin_area']
+        selected_item['locality'] = item['locality']
         list_parsed.append(selected_item)
     return list_parsed
 
+
 def select_allowed_places_types(request):
     try: 
-        parsed_selected = parse_selected(request.form.getlist("allowed_places_types"))
+        user_roles = [role.name for role in current_user.roles]
+        
+        if 'politician_country' in user_roles or 'admin' in user_roles:
 
-        requests.post(SERVER_API_URL + '/allowed_places_types', json=parsed_selected)
-        return render_template('index.html')
+            r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types')
+            api_results = r_server_api.json()['results']
+
+            selected_results = parse_selected(request.form.getlist("allowed_places_types"))
+
+            # Get selected elements by intersect
+            intersect_results = [item for item in api_results if item in selected_results]
+
+            for item in intersect_results:
+                data = {
+                    "type": item['type'],
+                    "location_type": "country",
+                    "location": current_user.location,
+                    "action": "add"
+                }
+                requests.put(SERVER_API_URL + '/allowed_places_types', json=data)
+            
+            # Get non-selected elements
+            difference_results = [item for item in api_results if item not in selected_results]
+            print(difference_results) 
+            for item in difference_results:
+                data = {
+                    "type": item['type'],
+                    "location_type": "country",
+                    "location": current_user.location,
+                    "action": "remove"
+                }
+                requests.put(SERVER_API_URL + '/allowed_places_types', json=data)
+                
+        elif 'politician_admin_area' in user_roles:
+            pass
+        elif 'politician_locality' in user_roles or 'police' in user_roles:
+            pass
+        
+        return redirect(url_for('main.index'))
     except requests.exceptions.RequestException as e:    
         raise SystemExit(e)

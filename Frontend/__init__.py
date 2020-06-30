@@ -6,6 +6,11 @@ from flask_user import UserManager
 
 from .config import default
 
+from geopy.geocoders import Nominatim
+
+# init geolocator
+geolocator = Nominatim(user_agent=__name__)
+
 # init SQLAlchemy
 db = SQLAlchemy()
 

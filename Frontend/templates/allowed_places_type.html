@@ -14,10 +14,10 @@
           {% for item in results %}
           <tr>
             <td><img src="{{item['icon']}}" width="30" height="30"></td>
-            {% if item['isChecked'] %}
-            <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['id']}}" checked><label>{{ item['title'] }}</label></td>
+            {% if item['is_allowed'] %}
+            <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['id']}}" checked><label> {{ item['title'] }}</label></td>
             {% else %}
-            <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['id']}}"><label>{{ item['title'] }}</label></td>
+            <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['id']}}"><label> {{ item['title'] }}</label></td>
             {% endif %}
           <p>
           {% endfor %}

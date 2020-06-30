@@ -7,6 +7,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(20))
     name = db.Column(db.String(100))
+    location = db.Column(db.String(50))
     # Necessary to Flask user
     email_confirmed_at = db.Column(db.DateTime())
 
