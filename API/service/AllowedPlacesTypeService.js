@@ -62,7 +62,10 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
                             "_id": 0, 
                             "type": 1,
                             "title": 1,
-                            "icon": 1
+                            "icon": 1,
+                            "country": 1,
+                            "admin_area": 1,
+                            "locality": 1
                         }
                     }
                 ]).toArray(function(err, result) {
@@ -108,7 +111,53 @@ module.exports.postAllowedPlaceType = function(req, res, next) {
     });
 };
 
+/**
+ * Add/remove a location to an allowed place type
+ * Add/remove a location to an allowed place type
+ *
+ * returns String
+ **/
+module.exports.putAllowedPlaceType = function(req, res, next) {
+    //Parameters
+    console.log("Request: " + JSON.stringify(req));
+    mongoClient.connect(mongoURL, function(err, db) {
+        if (err) throw err;
+        var dbase = db.db("tfg");
+        var data = req.undefined.value;
 
+        var query = {"type": data.type};
+        var values = {};
+        if (data.location_type == "country"){
+            if (data.action == "add") { 
+                values = { $addToSet: {"country" : data.location} };
+            } else if (data.action == "remove") {
+                values = { $pull: {"country" : data.location} };
+            }
+        } else if (data.location_type == "admin_area")
+            if (data.action == "add") { 
+                values = { $addToSet: {"admin_area" : data.location} };
+            } else if (data.action == "remove") {
+                values = { $pull: {"admin_area" : data.location} };
+            }
+        else if (data.location_type == "locality"){
+            if (data.action == "add") { 
+                values = { $addToSet: {"locality" : data.location} };
+            } else if (data.action == "remove") {
+                values = { $pull: {"locality" : data.location} };
+            }
+        }
+
+        dbase.collection("allowed_places_types").updateOne(query, values, function(err, response) {
+            if (err) throw err;
+            console.log("Updated type " + data.type);
+
+            res.send({
+                message: "Allowed places types updated"
+            });
+
+        });
+    });
+};
 
 
 

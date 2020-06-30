@@ -24,3 +24,9 @@ module.exports.postAllowedPlaceType = function postAllowedPlaceType (req, res, n
     AllowedPlacesType.postAllowedPlaceType(req.swagger.params, res, next);
 
 };
+
+module.exports.putAllowedPlaceType = function putAllowedPlaceType (req, res, next) {
+
+    AllowedPlacesType.putAllowedPlaceType(req.swagger.params, res, next);
+
+};

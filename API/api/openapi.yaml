@@ -131,6 +131,61 @@ paths:
       tags:
       - AllowedPlacesType
       x-swagger-router-controller: AllowedPlacesType
+    put:
+      description: Add/remove a location to an allowed place type
+      operationId: putAllowedPlaceType
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                location_type: 
+                  type: string
+                location: 
+                  type: string
+                action:
+                  type: string
+        required: true
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Created
+                title: Created
+                type: string
+          description: Created
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+        409:
+          content:
+            text/plain:
+              schema:
+                example: There is a conflict
+                title: Index conflict
+                type: string
+          description: DB index conflict
+      summary: Add/remove a location to an allowed place type
+      tags:
+      - AllowedPlacesType
+      x-swagger-router-controller: AllowedPlacesType
   /device_id:
     delete:
       description: This deletes the device ID.
@@ -343,7 +398,6 @@ components:
         type: restaurant
         title: Restaurant
         icon: icon.png
-        is_allowed: true
         country: [Spain, France]
         admin_area: [Extremadura, Andalucia]
         locality: [Caceres, Badajoz]
@@ -357,9 +411,6 @@ components:
         icon:
           example: icon.png
           type: string
-        is_allowed:
-          example: true # allowed
-          type: boolean
         country:
           example: [Spain, France]
           type: array

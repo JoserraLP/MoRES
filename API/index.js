@@ -116,7 +116,6 @@ mongoClient.connect(mongoURL, function(err, db) {
                             "type": element.id,
                             "title": element.title,
                             "icon": element.icon,
-                            "is_allowed": false,
                             "country": [],
                             "admin_area": [],
                             "locality": []
