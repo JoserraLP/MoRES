@@ -167,13 +167,13 @@ module.exports.putAllowedPlaceType = function(req, res, next) {
             } else if (data.action == "remove") {
                 values = { $pull: {"country" : data.location} };
             }
-        } else if (data.location_type == "admin_area")
+        } else if (data.location_type == "admin_area"){
             if (data.action == "add") { 
                 values = { $addToSet: {"admin_area" : data.location} };
             } else if (data.action == "remove") {
                 values = { $pull: {"admin_area" : data.location} };
             }
-        else if (data.location_type == "locality"){
+        }else if (data.location_type == "locality"){
             if (data.action == "add") { 
                 values = { $addToSet: {"locality" : data.location} };
             } else if (data.action == "remove") {

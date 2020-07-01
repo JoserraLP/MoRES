@@ -116,9 +116,9 @@ mongoClient.connect(mongoURL, function(err, db) {
                             "type": element.id,
                             "title": element.title,
                             "icon": element.icon,
-                            "country": ['Spain', 'France', 'Portugal', 'England'],
-                            "admin_area": [],
-                            "locality": []
+                            "country": ['Spain', 'France', 'Portugal', 'England'], // Some values for testing
+                            "admin_area": ['Andalucia', 'Extremadura', 'Madrid'],
+                            "locality": ['Caceres', 'Badajoz', 'Merida', 'Don Benito']
                         };
                         dbase.collection("allowed_places_types").insertOne(item, function(err, res) {
                             if (err) throw err;
