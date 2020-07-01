@@ -54,6 +54,17 @@ paths:
     get:
       description: Return all the allowed places types
       operationId: getAllowedPlacesType
+      parameters:
+        - in: query
+          name: location_type
+          description: Allowed Place Type location type 
+          schema:
+            type: string
+        - in: query
+          name: location
+          description: Allowed Place Type location
+          schema:
+            type: string
       responses:
         201:
           content:

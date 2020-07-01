@@ -55,7 +55,40 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
     mongoClient.connect(mongoURL, function(err, db) {
         if (err) throw err;
         var dbase = db.db("tfg");
-        dbase.collection("allowed_places_types").aggregate(
+        // Parameters values
+        var location_type = req.location_type.value;
+        var location = req.location.value; 
+        if (location_type && location){
+            //TODO make the query to the db
+            var match_query = {};
+            if (location_type == 'country')
+                match_query = { 'country': location };
+            else if (location_type == 'admin_area')
+                match_query = { 'admin_area': location};
+
+            dbase.collection("allowed_places_types").aggregate(
+                [
+                    {  $match: match_query },
+                    { $project : // Exclude the _id field
+                        {  
+                            "_id": 0, 
+                            "type": 1,
+                            "title": 1,
+                            "icon": 1,
+                            "country": 1,
+                            "admin_area": 1,
+                            "locality": 1
+                        }
+                    }
+                ]).toArray(function(err, result) {
+                    if (err) throw err;
+                    console.log("Allowed places types: " + JSON.stringify(result));
+                    res.send({
+                        results: result
+                    });
+                });
+        } else {
+            dbase.collection("allowed_places_types").aggregate(
                 [
                     { $project : // Exclude the _id field
                         {  
@@ -69,12 +102,13 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
                         }
                     }
                 ]).toArray(function(err, result) {
-            if (err) throw err;
-            console.log("Allowed places types: " + JSON.stringify(result));
-            res.send({
-                results: result
-            });
-        }); 
+                    if (err) throw err;
+                    console.log("Allowed places types: " + JSON.stringify(result));
+                    res.send({
+                        results: result
+                    });
+                });
+        }
     });
 };
 
