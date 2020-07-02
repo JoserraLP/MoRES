@@ -30,9 +30,14 @@
                             <a href="{{ url_for('main.map') }}" class="navbar-item">
                                 Map
                             </a>
+                            {% if not current_user.has_roles(['police']) %}
                             <a href="{{ url_for('main.allowed_places_types') }}" class="navbar-item">
                                 Allowed Places Types
                             </a>
+                            <a href="{{ url_for('main.show_statistics') }}" class="navbar-item">
+                                Stadistics
+                            </a>
+                            {% endif %}
                             <a href="{{ url_for('main.add_news') }}" class="navbar-item">
                                 Add news item
                             </a>

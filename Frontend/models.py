@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
 
     # Necessary to Flask user
     def has_roles(self, *args):
-        return set(args).issubset({role.name for role in self.roles})
+        return any(elem in [role.name for role in self.roles] for elem in args[0])
 
     def get_roles(self):
         return self.roles

@@ -63,6 +63,7 @@ def map():
         raise SystemExit(e)
 
 @main.route('/send_patrol', methods=['POST'])
+@roles_required('police')
 def send_patrol():
     data = request.form.to_dict()
     payload = json.dumps(data)
@@ -93,6 +94,7 @@ def add_news():
 # -------------- Allowed Places Types -------------- #
 
 @main.route('/allowed_places_types', methods=['GET', 'POST'])
+@roles_required(['admin', 'politician_country', 'politician_admin_area', 'politician_locality'])
 def allowed_places_types():
     if request.method == 'POST':
         return select_allowed_places_types(request)
@@ -125,7 +127,6 @@ def retrieve_allowed_places_types(results=None):
 
             r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types')
 
-            
 
         elif 'politician_admin_area' in user_roles:
             
@@ -289,3 +290,33 @@ def select_allowed_places_types(request):
         return redirect(url_for('main.index'))
     except requests.exceptions.RequestException as e:    
         raise SystemExit(e)
+
+# -------------- Statistics -------------- #
+
+@main.route('/statistics')
+@roles_required(['admin', 'politician_country', 'politician_admin_area', 'politician_locality'])
+def show_statistics():
+    user_roles = [role.name for role in current_user.roles]
+
+    raw_location = geolocator.geocode(current_user.location, language='en')
+    
+    if 'politician_country' in user_roles or 'admin' in user_roles:
+        location_type = "country"
+        location = current_user.location
+
+    elif 'politician_admin_area' in user_roles:
+    
+        location_type = "admin_area"
+        location = raw_location.raw['display_name'].split(', ')[1] # [Admin area, Country]
+
+    elif 'politician_locality' in user_roles or 'police' in user_roles:
+        location_type = "locality"
+        location = raw_location.raw['display_name'].split(', ')[-2]  # [Locality, ... , Admin area, Country]
+
+    return retrieve_statistics(location_type, location)
+
+def retrieve_statistics(location_type, location):
+    #TODO 
+    print(location)
+    print(location_type)
+    return 
