@@ -377,6 +377,46 @@ paths:
       tags:
       - NearbyDevices
       x-swagger-router-controller: NearbyDevices
+  /last_connected_devices:
+    get:
+      description: Return the number of connected devices within the specified time
+      operationId: getLastConnectedDevices
+      parameters:
+        - in: query
+          name: mins
+          required: true
+          description: Minutes from the device last connection 
+          schema:
+            type: number
+      responses:
+        201:
+          content:
+            text/plain:
+              schema:
+                example: Created
+                title: Created
+                type: string
+          description: Created
+        404:
+          content:
+            text/plain:
+              schema:
+                example: Not found
+                title: Endpoint not found
+                type: string
+          description: Not found response
+        405:
+          content:
+            text/plain:
+              schema:
+                example: The format is not valid
+                title: Invalid input
+                type: string
+          description: Invalid input
+      summary: Return the number of connected devices within the specified time
+      tags:
+      - LastConnectedDevices
+      x-swagger-router-controller: LastConnectedDevices
 components:
   responses:
     201:

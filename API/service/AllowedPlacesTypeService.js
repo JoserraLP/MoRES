@@ -59,7 +59,6 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
         var location_type = req.location_type.value;
         var location = req.location.value; 
         if (location_type && location){
-            //TODO make the query to the db
             var match_query = {};
             if (location_type == 'country')
                 match_query = { 'country': location };

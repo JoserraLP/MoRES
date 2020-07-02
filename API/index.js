@@ -9,9 +9,10 @@ https = require('https')
 var mongodb = require('mongodb');
 var mongoClient = mongodb.MongoClient;
 var mongoURL = "mongodb://localhost:27017/";
+var mongoOptions = { useUnifiedTopology: true };
 
 // DB and Collection creation
-mongoClient.connect(mongoURL, function(err, db) {
+mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
     if (err) throw err;
     var dbase = db.db("tfg");
 
@@ -47,7 +48,7 @@ client.subscribe('Location');
 client.on('message', function(topic, message, packet){
 	console.log("message is "+ message);
     console.log("topic is "+ topic);
-    mongoClient.connect(mongoURL, function(err, db) {
+    mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
         if (err) throw err;
         var dbase = db.db("tfg");
         message = JSON.parse(message);
@@ -92,7 +93,7 @@ var options_object = {
 oasTools.configure(options_object);
 
 // Load all allowed places types from the external API
-mongoClient.connect(mongoURL, function(err, db) {
+mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
     if (err) throw err;
     var allowed_places_types_api = 'https://places.demo.api.here.com/places/v1/categories/places/?app_id=DemoAppId01082013GAL&app_code=AJKnXv84fjrb0KIHawS0Tg#'
     var dbase = db.db("tfg");
