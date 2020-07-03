@@ -16,14 +16,8 @@ mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
     if (err) throw err;
     var dbase = db.db("tfg");
 
-    dbase.createCollection("allowed_places_types", function(err, res){
-        if (err) throw err;
-    });
     dbase.collection("allowed_places_types").createIndex({"type": 1}, {unique : true}); 
 
-    dbase.createCollection("device", function(err, res){
-        if (err) throw err;
-    });
     dbase.collection("device").createIndex({"location" : "2dsphere"});
     //dbase.collection("device").createIndex({"createdAt" : 1}, {expireAfterSeconds: 86400}); // 24 hours to delete the document
 
@@ -125,7 +119,6 @@ mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
                             if (err) throw err;
                         });
                     });
-                    db.close();
                 });
 
                 }).on("error", (err) => {
