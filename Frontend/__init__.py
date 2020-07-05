@@ -4,9 +4,9 @@ from flask_mqtt import Mqtt
 from flask_login import LoginManager
 from flask_user import UserManager
 
-from .config import default
-
 from geopy.geocoders import Nominatim
+
+from .config import default
 
 # init geolocator
 geolocator = Nominatim(user_agent=__name__)
@@ -19,9 +19,18 @@ mqtt = Mqtt()
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
+    ''' Handle connection to MQTT broker. '''
     print("Connected to MQTT")
 
 def create_app():
+    ''' Create a Flask app, configure it. register some project blueprints as 'auth' or 'main', 
+        initialize related services as MQTT or SQLAlchemy (with data insertion) and the flask login manager.
+
+        Returns:
+            app (object): Configured Flask app
+
+    '''
+    # Create Flask app 
     app = Flask(__name__, instance_relative_config=True)
 
     # Configure the application with the config file
@@ -29,11 +38,11 @@ def create_app():
 
     # Register project blueprints 
 
-    # Auth routes
+    # -> Auth routes
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
 
-    # Non-auth routes 
+    # -> Non-auth routes 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
@@ -54,8 +63,8 @@ def create_app():
         db.create_all()
         # If there are no users and no roles create and insert them on the db
         if not User.query.limit(1).all() and not Role.query.limit(1).all():
-            from .add_to_db import add_to_db
-            add_to_db(db)
+            from .insert_data_to_db import insert_data
+            insert_data(db)
 
     # Create the LoginManager
     login_manager = LoginManager()

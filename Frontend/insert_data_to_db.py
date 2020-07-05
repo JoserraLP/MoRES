@@ -3,7 +3,13 @@ import datetime
 from .models import User, Role
 from werkzeug.security import generate_password_hash
 
-def add_to_db(db):
+def insert_data(db):
+    ''' Insert data in the database
+
+        Parameters:
+            db (object): database instance
+
+    '''
 
     # ------- User ------- #
 
@@ -42,6 +48,7 @@ def add_to_db(db):
         email_confirmed_at=datetime.datetime.utcnow()
     )
 
+    # Search the role
     politician_country_role = db.session.query(Role).filter_by(name="politician_country").first()
 
     user.roles.append(politician_country_role)
@@ -70,6 +77,7 @@ def add_to_db(db):
         email_confirmed_at=datetime.datetime.utcnow()
     )
 
+    # Search the role
     politician_admin_area_role = db.session.query(Role).filter_by(name="politician_admin_area").first()
 
     user.roles.append(politician_admin_area_role)
@@ -98,6 +106,7 @@ def add_to_db(db):
         email_confirmed_at=datetime.datetime.utcnow()
     )
 
+    # Search the role
     politician_locality_role = db.session.query(Role).filter_by(name="politician_locality").first()
 
     user.roles.append(politician_locality_role)
@@ -126,6 +135,7 @@ def add_to_db(db):
         email_confirmed_at=datetime.datetime.utcnow()
     )
 
+    # Search the role
     police_role = db.session.query(Role).filter_by(name="police").first()
 
     user.roles.append(police_role)
