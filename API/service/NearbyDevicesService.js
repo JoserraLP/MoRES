@@ -28,7 +28,7 @@ module.exports.getNearbyDevices = function(req, res, next) {
     mongoClient.connect(mongoURL, function(err, db) {
         if (err) throw err;
         var dbase = db.db("tfg");
-
+    
         var query = {	
             "location" : {	
                 $near : {	
@@ -39,11 +39,13 @@ module.exports.getNearbyDevices = function(req, res, next) {
                     $maxDistance : req.rad.value,	
                     $minDistance : 0	
                 }	
-            }/*,
-            "lastUpdate" : {
-                $gt : new Date(Date.now() - 1000 * 60 * 5) // 5 Minutes
-            }	*/
+            }
         }	
+
+        var lastConnectTime = req.mins.value
+        if (lastConnectTime){
+            query.lastUpdate = { $gt : new Date(Date.now() - 1000 * 60 * lastConnectTime) };// lastConnectedTime Minutes
+        }
 
         dbase.collection("device").find(query).toArray(function(err, result) {
             if (err) throw err;

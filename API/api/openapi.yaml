@@ -66,14 +66,14 @@ paths:
           schema:
             type: string
       responses:
-        201:
+        200:
           content:
             text/plain:
               schema:
-                example: Created
-                title: Created
+                example: OK
+                title: OK
                 type: string
-          description: Created
+          description: OK
         404:
           content:
             text/plain:
@@ -243,14 +243,14 @@ paths:
       description: Return all the devices ID
       operationId: getDeviceID
       responses:
-        201:
+        200:
           content:
             text/plain:
               schema:
-                example: Created
-                title: Created
+                example: OK
+                title: OK
                 type: string
-          description: Created
+          description: OK
         404:
           content:
             text/plain:
@@ -348,15 +348,23 @@ paths:
         schema:
           type: string
         style: form
+      - description: last minutes device connected 
+        explode: true
+        in: query
+        name: mins
+        required: false
+        schema:
+          type: number
+        style: form
       responses:
-        201:
+        200:
           content:
             text/plain:
               schema:
-                example: Created
-                title: Created
+                example: OK
+                title: OK
                 type: string
-          description: Created
+          description: OK
         404:
           content:
             text/plain:
@@ -377,26 +385,36 @@ paths:
       tags:
       - NearbyDevices
       x-swagger-router-controller: NearbyDevices
-  /last_connected_devices:
+  /area_devices:
     get:
-      description: Return the number of connected devices within the specified time
-      operationId: getLastConnectedDevices
+      description: Return the position of the devices within an area
+      operationId: getAreaDevices
       parameters:
-        - in: query
-          name: mins
-          required: true
-          description: Minutes from the device last connection 
-          schema:
-            type: number
+      - description: area 
+        explode: true
+        in: query
+        name: area
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: last minutes device connected 
+        explode: true
+        in: query
+        name: mins
+        required: false
+        schema:
+          type: number
+        style: form
       responses:
-        201:
+        200:
           content:
             text/plain:
               schema:
-                example: Created
-                title: Created
+                example: OK
+                title: OK
                 type: string
-          description: Created
+          description: OK
         404:
           content:
             text/plain:
@@ -413,12 +431,20 @@ paths:
                 title: Invalid input
                 type: string
           description: Invalid input
-      summary: Return the number of connected devices within the specified time
+      summary: Return the devices within an area
       tags:
-      - LastConnectedDevices
-      x-swagger-router-controller: LastConnectedDevices
+      - AreaDevices
+      x-swagger-router-controller: AreaDevices
 components:
   responses:
+    200:
+      content:
+        text/plain:
+          schema:
+            example: OK
+            title: OK
+            type: string
+      description: OK
     201:
       content:
         text/plain:
