@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+      <div class="notification is-danger">
+          {{ messages[0] }}
+      </div>
+  {% else %}
+    <h1>Statistics</h1>
+    
+    {% if statistics %}
+      <br>
+      <h2>Last connected devices</h2>
+      <p>Last 5 minutes: {{ statistics.last_5_minutes }}</p>
+      <p>Last hour: {{ statistics.last_1_hour }}</p>
+      <p>Last 12 hours: {{ statistics.last_12_hours }}</p>
+      <p>Last day: {{ statistics.last_1_day }}</p>
+      <p>Last week: {{ statistics.last_1_week }}</p>
+      <br>
+      <h2>Total connected devices</h2>
+      <p>{{ statistics.total }}</p>
+      <br>
+    {% else %}
+      <p>The statistics cannot be loaded, please refresh the page</p>
+    {% endif %}
+  {% endif %}
+  {% endwith %}
+
+{% endblock %}
