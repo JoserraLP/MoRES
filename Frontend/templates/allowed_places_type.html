@@ -9,7 +9,7 @@
   {% else %}
     <h1>Allowed Places Types</h1>
     {% if results %}
-      <form action="{{url_for('main.allowed_places_types')}}" method="POST">
+      <form action="{{url_for('allowed_places.allowed_places_types')}}" method="POST">
         <table>
           {% for item in results %}
           <tr>

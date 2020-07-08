@@ -55,7 +55,7 @@
         
         popup
         .setLatLng(e.latlng)
-        .setContent('<form id="popup-form" action="{{url_for("main.send_patrol")}}" method="POST">\
+        .setContent('<form id="popup-form" action="{{url_for("map.send_patrol")}}" method="POST">\
                         <input type="hidden" id="lat" name="lat" value='+latValue+'>\
                         <input type="hidden" id="lng" name="lng" value='+lngValue+'>\
                         <button id="button-submit" type="submit">Send patrol</button>\

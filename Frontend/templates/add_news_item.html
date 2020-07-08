@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Añadir noticia</h1>
-<form action="{{url_for('main.add_news')}}" method="POST">
+<form action="{{url_for('news.add_news')}}" method="POST">
     <label for="title">Titulo:</label><br>
     <input type="text" id="title" name="title"><br>
     <label for="date">Fecha:</label><br>

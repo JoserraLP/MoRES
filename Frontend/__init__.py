@@ -46,6 +46,22 @@ def create_app():
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    # -> Map routes 
+    from .map import map as map_blueprint
+    app.register_blueprint(map_blueprint)
+
+    # -> Allowed places types routes 
+    from .allowed_places_types import allowed_places as allowed_places_types_blueprint
+    app.register_blueprint(allowed_places_types_blueprint)
+
+    # -> News routes 
+    from .news import news as news_blueprint
+    app.register_blueprint(news_blueprint)
+
+    # -> Statistics routes 
+    from .statistics import statistics as statistics_blueprint
+    app.register_blueprint(statistics_blueprint)
+
     # Init the MQTT service
     mqtt.init_app(app)
 
