@@ -6,6 +6,7 @@ from . import geolocator
 
 import requests
 import ast
+import json
 
 # Statistics blueprint
 statistics = Blueprint('statistics', __name__)
@@ -28,33 +29,38 @@ def show_statistics():
         area = location.raw['boundingbox']
         
         # Initialize the statistics dict
-        statistics = {}
+        data = {}
 
         # Statistics -> 5 minutes
-        statistics ['last_5_minutes'] = retrieve_num_devices(area, 5)
+        data['5 Minutes'] = retrieve_num_devices(area, 5)
 
         # Statistics -> 60 minutes = 1 hour
-        statistics ['last_1_hour'] = retrieve_num_devices(area, 60)
-
+        data['1 Hour'] = retrieve_num_devices(area, 60)
+        
         # Statistics -> 720 minutes = 12 hours
-        statistics ['last_12_hours'] = retrieve_num_devices(area, 720)
+        data['12 Hours'] = retrieve_num_devices(area, 720)
 
         # Statistics -> 1440 minutes = 24 hours
-        statistics ['last_1_day'] = retrieve_num_devices(area, 1440)
+        data['1 Day'] = retrieve_num_devices(area, 1440)
 
         # Statistics -> 10080 minutes = 7 days = 1 week
-        statistics ['last_1_week'] = retrieve_num_devices(area, 10080)
+        data['1 Week'] = retrieve_num_devices(area, 10080)
+
+        # Statistics -> 282240 minutes = 28 days = 4 week = 1 month
+        data['1 Month'] = retrieve_num_devices(area, 282240)
 
         # Statistics -> Total number
-        statistics ['total'] = retrieve_num_devices(area, -1)
+        data['Total'] = retrieve_num_devices(area, -1)
 
-        return render_template('statistics.html', statistics=statistics)
+        json_data = json.dumps(data)
 
-    except:
+        return render_template('statistics.html', data=json_data)
+
+    except Exception as e:
+        print(e)
         # Exception -> show message    
         flash('Error, the statistics could not be loaded')
         return render_template('statistics.html')
-
     
 def retrieve_num_devices(area, minutes):
     ''' Parse selected allowed places types to a list of objects that fits the API
