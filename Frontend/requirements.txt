@@ -1,8 +1,0 @@
-astroid==2.3.3
-Flask==1.1.1
-Flask-Bootstrap==3.3.7.1
-Flask-MQTT==1.1.0
-Flask-SocketIO==4.2.1
-Jinja2==2.11.1
-json5==0.9.3
-requests==2.23.0
