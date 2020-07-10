@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Añadir noticia</h1>
+<form action="{{url_for('news.add_news')}}" method="POST">
+    <label for="title">Titulo:</label><br>
+    <input type="text" id="title" name="title"><br>
+    <label for="date">Fecha:</label><br>
+    <input type="date" id="date" name="date"><br>
+    <label for="author">Autor:</label><br>
+    <input type="text" id="author" name="author"><br>
+    <label for="description">Descripción:</label><br>
+    <input type="text" id="description" name="description"><br>
+    <label for="location">Localización:</label><br>
+    <input type="text" id="location" name="location"><br>
+    <label for="expansion">Expansion:</label><br>
+    <select id="expansion" name="expansion">
+        <option value="Locality">Localidad</option>
+        <option value="AdminArea">Provincia</option>
+        <option value="Country">Pais</option>
+    </select><br>
+    <label for="image">Imagen:</label><br>
+    <input type="text" id="image" name="image"><br>
+    <label for="relevance">Relevancia:</label><br>
+    <select id="relevance" name="relevance">
+        <option value=0>Normal</option>
+        <option value=1>Urgente</option>
+    </select><br>
+    <input type="submit" value="Enviar">
+</form>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+      <div class="notification is-danger">
+          {{ messages[0] }}
+      </div>
+  {% else %}
+    <h1>Allowed Places Types</h1>
+    {% if results %}
+      <form action="{{url_for('allowed_places.allowed_places_types')}}" method="POST">
+        <table>
+          {% for item in results %}
+          <tr>
+            <td><img src="{{item['icon']}}" width="30" height="30"></td>
+            {% if item['is_allowed'] %}
+            <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" checked><label> {{ item['title'] }}</label></td>
+            {% else %}
+            <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}"><label> {{ item['title'] }}</label></td>
+            {% endif %}
+          <p>
+          {% endfor %}
+        </table>
+        <input type="submit" value="Enviar">
+      </form>
+    {% else %}
+      <p>Allowed places types cannot be loaded, please refresh the page</p>
+    {% endif %}
+  {% endif %}
+  {% endwith %}
+
+{% endblock %}
