@@ -26,7 +26,7 @@ mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
 
 // MQTT
 var mqtt = require('mqtt'); 
-var client = mqtt.connect("mqtt://192.168.1.83");
+var client = mqtt.connect("mqtt://192.168.1.61");
 
 client.on("connect", function(){
     console.log("Connected to MQTT Broker");

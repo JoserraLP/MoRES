@@ -44,7 +44,7 @@ module.exports.getAreaDevices = function(req, res, next) {
             if (err) throw err;
             console.log("Area devices num: " + JSON.stringify(result));	
             // To avoid frontend CORS error
-            res.setHeader('Access-Control-Allow-Origin', 'http://192.168.1.83:5000');
+            res.setHeader('Access-Control-Allow-Origin', 'http://192.168.1.61:5000');
             res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
             
             res.send({	

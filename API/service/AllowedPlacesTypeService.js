@@ -6,7 +6,7 @@ var mongoURL = "mongodb://localhost:27017/"
 
 // MQTT
 var mqtt = require('mqtt')
-var mqttClient = mqtt.connect('mqtt://192.168.1.83')
+var mqttClient = mqtt.connect('mqtt://192.168.1.61')
 
 mqttClient.on("connect", function(){
     console.log("Connected to MQTT Broker");
