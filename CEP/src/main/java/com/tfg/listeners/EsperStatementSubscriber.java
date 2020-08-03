@@ -11,7 +11,7 @@ import com.tfg.utils.Constants;
 
 public class EsperStatementSubscriber {
 
-	private String topic = "observations";
+	private String topic = "Observations";
 	private MqttClient client;
 	private int qos = 1;
 
@@ -46,6 +46,23 @@ public class EsperStatementSubscriber {
 		System.out.println(obsName);
 		MqttMessage message = new MqttMessage(obsName.getBytes());
 		message.setQos(qos);
-		this.client.publish(this.topic, message); // Blocking publish
+		
+		// Send to middleware the observations
+		switch (obsName) {
+		case "o1":
+			this.client.publish(this.topic, new MqttMessage("People_Moving_HIGH".getBytes()));
+			break;
+		case "o2":
+			this.client.publish(this.topic, new MqttMessage("People_Moving_HIGH_NIGHT".getBytes()));
+			break;
+		case "o3":
+			this.client.publish(this.topic, new MqttMessage("Patrol_Moving_HIGH".getBytes()));
+			break;
+		case "o4":
+			this.client.publish(this.topic, new MqttMessage("Patrol_Moving_LOW".getBytes()));
+			break;
+		default:
+			break;
+		}
 	}
 }
