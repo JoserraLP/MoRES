@@ -1,0 +1,24 @@
+html, body {
+    height: 100%;
+}
+  
+.full-height {
+    height: 100%;
+}
+
+.map {
+    height: 500px; 
+    width: 600px;
+}
+
+.margin-center {
+    margin: 0 auto;
+}
+
+.bg-salmon {
+    background: rgb(255, 160, 122);
+}
+
+.bg-light-green {
+    background: rgb(144, 238, 144);
+}

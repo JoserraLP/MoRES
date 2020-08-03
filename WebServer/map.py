@@ -48,17 +48,20 @@ def show_map():
         # Get current device location
         cur_location = get_cur_location(ip_address)
 
+        # Get current user roles
+        current_user_roles = [role.name for role in current_user.roles]
+
+        # Parse to JSON
+        json_roles = json.dumps(current_user_roles)
+
         if cur_location['status'] != 'fail':
             # Remote IP loaded
 
-            # Get user roles
-            user_roles = current_user.get_roles()
-
             # Set the params to make the request
-            params = {'lat': cur_location['lat'], 'lng': cur_location['lon'], 'rad': RADIUS_ROLE[user_roles[0]]}
+            params = {'lat': cur_location['lat'], 'lng': cur_location['lon'], 'rad': RADIUS_ROLE[current_user_roles[0]]}
             
             #TODO make the map with the location of the user
-            return render_template('map.html', data=params)
+            return render_template('map.html', data=params, cur_location=cur_location['city'], user_roles=json_roles)
             
         else:
             # Remote IP could not be loaded
@@ -66,7 +69,7 @@ def show_map():
             # Params are defined to appear in a static place
             params = {'lat': -6.9706100, 'lng': 38.8778900, 'rad': 1000000000}
 
-            return render_template('map.html', data=params)
+            return render_template('map.html', data=params, cur_location="Badajoz", user_roles=json_roles)
     except requests.exceptions.RequestException as e:    
         raise SystemExit(e)
 

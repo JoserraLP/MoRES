@@ -1,31 +1,59 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Añadir noticia</h1>
-<form action="{{url_for('news.add_news')}}" method="POST">
-    <label for="title">Titulo:</label><br>
-    <input type="text" id="title" name="title"><br>
-    <label for="date">Fecha:</label><br>
-    <input type="date" id="date" name="date"><br>
-    <label for="author">Autor:</label><br>
-    <input type="text" id="author" name="author"><br>
-    <label for="description">Descripción:</label><br>
-    <input type="text" id="description" name="description"><br>
-    <label for="location">Localización:</label><br>
-    <input type="text" id="location" name="location"><br>
-    <label for="expansion">Expansion:</label><br>
-    <select id="expansion" name="expansion">
-        <option value="Locality">Localidad</option>
-        <option value="AdminArea">Provincia</option>
-        <option value="Country">Pais</option>
-    </select><br>
-    <label for="image">Imagen:</label><br>
-    <input type="text" id="image" name="image"><br>
-    <label for="relevance">Relevancia:</label><br>
-    <select id="relevance" name="relevance">
-        <option value=0>Normal</option>
-        <option value=1>Urgente</option>
-    </select><br>
-    <input type="submit" value="Enviar">
-</form>
+<div class="p-2 mt-5">
+    <h1>Add news item</h1>
+</div>
+<div class="container mt-5">
+    <div class="col-xl-6 col-lg-8 col-md-10 col-sm-12 mx-auto text-center form">
+        <form action="{{url_for('news.add_news')}}" method="POST" class="justify-content-center">
+            <div class="form-group row">
+                <label class="col-4 text-left mt-1" for="title">Title:</label>
+                <input class="col-8 text-left" type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group row">
+                <label class="col-4 text-left mt-1" for="author">Author:</label>
+                <input class="col-8 text-left" type="text" id="author" name="author" required>
+            </div>
+            <div class="form-group row">
+                <label class="col-4 text-left mt-1" for="description">Description:</label>
+                <textarea class="col-8 text-left" id="description" rows="1" name="description" required></textarea>
+            </div>
+            <div class="form-group row">
+                <label class="col-4 text-left mt-1" for="image">Image:</label>
+                <input class="col-8 text-left" type="text" id="image" name="image" required>
+            </div>
+            <div class="form-group row">
+                <label class="col-4 text-left mt-1" for="location">Location:</label>
+                <input class="col-8 text-left" type="text" id="location" name="location" required>
+            </div>
+            <div class="form-group row">
+                <label class="col-4 text-left mt-1" for="expansion">Expansion:</label>
+                <div class="mx-auto">
+                    <select id="expansion" name="expansion" required>
+                        <option value="Locality">Locality</option>
+                        <option value="AdminArea">Admin Area</option>
+                        <option value="Country">Country</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-4 text-left mt-1" for="relevance">Relevance:</label>
+                <div class="mx-auto">
+                    <select id="relevance" name="relevance" required>
+                        <option value=0>Normal</option>
+                        <option value=1>Urgent</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-4 text-left mt-1" for="date">Date:</label>
+                <div class="col-8 mx-auto">
+                    <input class="text-left" type="date" id="date" name="date" required>
+                </div>
+            </div>
+            <input class="mt-2 btn btn-dark" type="submit" value="Send">
+        </form>
+    </div>
+</div>
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required
 from . import mqtt
 
@@ -29,7 +29,7 @@ def create_news_item(request):
         # Publish the payload on the MQTT broker
         mqtt.publish('News', payload)
 
-        return render_template('index.html')
+        return redirect(url_for('main.index'))
     except requests.exceptions.RequestException as e:   
         raise SystemExit(e)
 

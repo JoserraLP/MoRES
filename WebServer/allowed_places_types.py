@@ -107,7 +107,10 @@ def get_allowed_places_types_by_current_user_roles():
     # Make the request to the API with the params
     r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types', params=params)
 
-    return r_server_api.json()['results']
+    # Order the results
+    ordered_response = sorted(r_server_api.json()['results'], key = lambda x : (x['icon'], x['title']))
+
+    return ordered_response
 
 
 def retrieve_allowed_places_types():
@@ -129,7 +132,7 @@ def retrieve_allowed_places_types():
     except:
         # Exception -> show message    
         flash('Error, the allowed places types could not be loaded')
-        return render_template('allowed_places_type.html', results=results)
+        return render_template('allowed_places_type.html')
     
 def parse_selected(selected_results):
     ''' Parse selected allowed places types to a list of objects that fits the API

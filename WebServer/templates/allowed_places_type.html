@@ -10,24 +10,51 @@
     <h1>Allowed Places Types</h1>
     {% if results %}
       <form action="{{url_for('allowed_places.allowed_places_types')}}" method="POST">
-        <table>
-          {% for item in results %}
-          <tr>
-            <td><img src="{{item['icon']}}" width="30" height="30"></td>
-            {% if item['is_allowed'] %}
-            <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" checked><label> {{ item['title'] }}</label></td>
-            {% else %}
-            <td><input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}"><label> {{ item['title'] }}</label></td>
-            {% endif %}
-          <p>
+        {% for results_row in results | batch(4, '&nbsp;') %}
+        <div class="row">
+          {% for item in results_row %}
+          {% if item['is_allowed'] %}
+          <div class="col bg-light-green mt-3 mb-3 ml-5 mr-5 p-2" data-id="{{item['type']}}" onclick="checkSelectedElem(this)">
+            <input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" hidden checked>
+          {% else %}
+          <div class="col bg-salmon mt-3 mb-3 ml-5 mr-5 p-2" data-id="{{item['type']}}" onclick="checkSelectedElem(this)">
+            <input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" hidden>
+          {% endif %}
+            <div class="row">
+              <div class="col-3"><img src="{{item['icon']}}" width="50" height="50"></div>
+              <div class="pt-3 text-center">{{ item['title'] }}</div>
+            </div>
+          </div>
           {% endfor %}
-        </table>
-        <input type="submit" value="Enviar">
+        </div>
+        {% endfor %}
+        <div class="pt-3 pb-3">
+          <input class="btn btn-dark" type="submit" value="Update">
+        </div>
       </form>
     {% else %}
       <p>Allowed places types cannot be loaded, please refresh the page</p>
     {% endif %}
   {% endif %}
   {% endwith %}
+
+  <script>
+    function checkSelectedElem(elem)
+    {
+      var checkbox = document.getElementById(elem.getAttribute("data-id"));
+      
+      if (checkbox){
+        if (checkbox.checked){ 
+          checkbox.checked = false;
+          elem.classList.remove("bg-light-green");
+          elem.className += " bg-salmon";
+        }else{
+          checkbox.checked = true;
+          elem.classList.remove("bg-salmon");
+          elem.className += " bg-light-green";
+        }
+      }
+    }
+  </script>
 
 {% endblock %}

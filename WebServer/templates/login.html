@@ -1,36 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="column is-4 is-offset-4">
-    <h3 class="title">Login</h3>
-    <div class="box">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="notification is-danger">
-                {{ messages[0] }}
-            </div>
-        {% endif %}
-        {% endwith %}
-        <form method="POST" action="/login">
-            <div class="field">
-                <div class="control">
-                    <input class="input is-large" type="email" name="email" placeholder="Your Email" autofocus="">
+<div class="d-flex flex-row justify-content-center mr-5 ml-5 mt-5">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="notification is-danger">
+            {{ messages[0] }}
+        </div>
+    {% endif %}
+    {% endwith %}
+    <div class="container">
+        <div class="col-xl-5 col-lg-6 col-md-8 col-sm-10 mx-auto text-center form p-4">
+            <form method="POST" action="/login" class="justify-content-center">
+                <div class="form-group row">
+                    <label class="col-4 text-left mt-1" for="email">Email:</label>
+                    <input class="col-8 text-left" type="email" name="email" placeholder="email_test@gmail.com" autofocus="" required>
                 </div>
-            </div>
 
-            <div class="field">
-                <div class="control">
-                    <input class="input is-large" type="password" name="password" placeholder="Your Password">
+                <div class="form-group row">
+                    <label class="col-4 text-left mt-1" for="password">Password:</label>
+                    <input class="col-8 text-left" type="password" name="password" placeholder="************" required>
                 </div>
-            </div>
-            <div class="field">
-                <label class="checkbox">
-                    <input type="checkbox">
-                    Remember me
-                </label>
-            </div>
-            <button class="button is-block is-info is-large is-fullwidth">Login</button>
-        </form>
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox">
+                        Remember me
+                    </label>
+                </div>
+                <button class="btn btn-dark" type="submit">Login</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

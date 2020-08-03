@@ -14,51 +14,51 @@
   {% else %}
     <h1>Statistics</h1>
     {% if data %}
-      <canvas id="chart" width="600" height="400"></canvas>
-      <script>
-        var data = JSON.parse('{{ data|safe }}');
-        var labels = []; 
-        var values = [];
-        for (var k in data){
-          labels.push(k);
-          values.push(data[k]);
-        }
+      <div class="margin-center">
+        <canvas id="chart" width="600" height="400"></canvas>
+        <script>
+          var data = JSON.parse('{{ data|safe }}');
+          var labels = []; 
+          var values = [];
+          for (var k in data){
+            labels.push(k);
+            values.push(data[k]);
+          }
 
-        // bar chart data
-        var barData = {
-          labels :  labels,
-          datasets : [
-            {
-              fillColor: "rgba(0,0,0,1)",
-              strokeColor: "rgba(255,255,255,1)",
-              pointColor: "rgba(151,187,205,1)",
-              data : values
-            }
-          ]
-        }
-  
-        // get bar chart canvas
-        var mychart = document.getElementById("chart").getContext("2d");
-  
-        var steps = 10;
-        var max = values[values.length-1];
+          // bar chart data
+          var barData = {
+            labels :  labels,
+            datasets : [
+              {
+                fillColor: "rgba(0,0,0,1)",
+                strokeColor: "rgba(255,255,255,1)",
+                pointColor: "rgba(151,187,205,1)",
+                data : values
+              }
+            ]
+          }
+    
+          // get bar chart canvas
+          var mychart = document.getElementById("chart").getContext("2d");
+    
+          var steps = 10;
+          var max = values[values.length-1];
 
-        // draw bar chart
-        new Chart(mychart).Bar(barData, {
-          showTooltips: false,
-          scaleOverride: true,
-          scaleSteps: steps,
-          scaleStepWidth: Math.ceil(max / steps),
-          scaleStartValue: 0,
-          scaleShowVerticalLines: true,
-          scaleShowGridLines : true,
-          barShowStroke : true,
-          scaleShowLabels: true
-        });
-      </script>
-
+          // draw bar chart
+          new Chart(mychart).Bar(barData, {
+            scaleOverride: true,
+            scaleSteps: steps,
+            scaleStepWidth: Math.ceil(max / steps),
+            scaleStartValue: 0,
+            scaleShowVerticalLines: true,
+            scaleShowGridLines : true,
+            barShowStroke : true,
+            scaleShowLabels: true
+          });
+        </script>
+      </div>
     {% else %}
-      <p>The statistics cannot be loaded, please refresh the page</p>
+      <p class="alert-info"> The statistics cannot be loaded, please refresh the page</p>
     {% endif %}
   {% endif %}
   {% endwith %}
