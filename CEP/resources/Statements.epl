@@ -1,0 +1,52 @@
+module TFG2;
+import com.tfg.enums.*;
+create objectarray schema peopleMovingEvent(ts long) starttimestamp ts endtimestamp ts;
+create objectarray schema peopleMoving(val peopleMoving,ts long) starttimestamp ts endtimestamp ts;
+create objectarray schema patrolMovingEvent(ts long) starttimestamp ts endtimestamp ts;
+create objectarray schema patrolMoving(val patrolMoving,ts long) starttimestamp ts endtimestamp ts;
+create objectarray schema timezone(val timezone,ts long) starttimestamp ts endtimestamp ts;
+
+INSERT INTO peopleMovingCOUNT
+SELECT count(*) as val,current_timestamp as ts
+FROM peopleMovingEvent#time_batch(60.0 sec) as a;
+
+INSERT INTO peopleMovingIF
+SELECT CASE WHEN a.val < 20.0 THEN peopleMoving.LOW ELSE peopleMoving.HIGH END as val,current_timestamp as ts
+FROM peopleMovingCOUNT#lastevent as a;
+
+INSERT INTO peopleMoving
+SELECT a.val as val,current_timestamp as ts
+FROM pattern [ every ( a = peopleMovingIF ) ];
+
+INSERT INTO patrolMovingCOUNT
+SELECT count(*) as val,current_timestamp as ts
+FROM patrolMovingEvent#time_batch(60.0 sec) as a;
+
+INSERT INTO patrolMovingIF
+SELECT CASE WHEN a.val < 5.0 THEN patrolMoving.LOW ELSE patrolMoving.HIGH END as val,current_timestamp as ts
+FROM patrolMovingCOUNT#lastevent as a;
+
+INSERT INTO patrolMoving
+SELECT a.val as val,current_timestamp as ts
+FROM pattern [ every ( a = patrolMovingIF ) ];
+
+INSERT INTO Observations
+SELECT 'o1' as val
+FROM pattern [ every ( peopleMoving(val=peopleMoving.HIGH) ) ];
+	
+INSERT INTO Observations
+SELECT 'o2' as val
+FROM pattern [ every ( peopleMoving(val=peopleMoving.HIGH) AND timezone(val=timezone.NIGHT) ) ];
+	
+INSERT INTO Observations
+SELECT 'o3' as val
+FROM pattern [ every ( patrolMoving(val=patrolMoving.HIGH) ) ];
+	
+INSERT INTO Observations
+SELECT 'o4' as val
+FROM pattern [ every ( patrolMoving(val=patrolMoving.LOW) ) ];
+	
+
+@Name('Observations')
+SELECT val
+FROM Observations;

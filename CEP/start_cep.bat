@@ -1,0 +1,1 @@
+start cmd /k java -jar TFG-CEP.jar

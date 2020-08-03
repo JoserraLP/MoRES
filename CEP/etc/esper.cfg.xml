@@ -1,0 +1,23 @@
+<xml version="1.0" encoding="UTF-8">
+<esper-configuration
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.espertech.com/schema/esper"
+	xsi:noNamespaceSchemaLocation="./esper-configuration-8-0.xsd">
+	
+	<event-type name="Humidity" class="com.espertech.esper.example.models.Humidity"/>
+	<event-type name="Luminosity" class="com.espertech.esper.example.models.Luminosity"/>
+	<event-type name="AirQuality" class="com.espertech.esper.example.models.AirQuality"/>
+	<event-type name="Noise" class="com.espertech.esper.example.models.Noise"/>
+	<event-type name="temperature" class="com.espertech.esper.example.models.Temperature"/>
+	<event-type name="Weather" class="com.espertech.esper.example.models.Weather"/>
+
+	<database-reference name="healthypork">
+		<drivermanager-connection
+			class-name="oracle.jdbc.OracleDriver"
+			url="jdbc:mysql://localhost:3306/healthypork"
+			user="root" password="root">
+		</drivermanager-connection>
+	</database-reference>
+
+</esper-configuration>
+</xml>
