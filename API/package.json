@@ -7,7 +7,8 @@
     "start": "node index.js"
   },
   "keywords": [
-    "OAI"
+    "OAI",
+    "heroku"
   ],
   "license": "Unlicense",
   "private": true,
@@ -19,5 +20,8 @@
     "mongodb": "^3.5.7",
     "mqtt": "^4.1.0",
     "oas-tools": "^2.1.4"
+  },
+  "engines": {
+    "node": "12.16.3"
   }
 }
