@@ -11,8 +11,8 @@ payload = json.dumps({
   "date": "07/05/2020",
   "author": "JoserraLP",
   "description": "This is the first description",
-  "location": "Extremadura",
-  "expansion": "AdminArea",
+  "location": "Caceres",
+  "expansion": "Locality",
   "image": "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg",
   "relevance" : 0
 })

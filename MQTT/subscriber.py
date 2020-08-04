@@ -7,7 +7,9 @@ def on_message(client, userdata, message):
 client = mqtt.Client("Subscriber_test")
 client.connect("192.168.1.83", port=1883)
 client.subscribe("Location")
-client.subscribe("Hello")
+client.subscribe("News")
+client.subscribe("Patrol")
+client.subscribe("AllowedPlacesTypes")
 
 client.on_message = on_message
 client.loop_forever()
