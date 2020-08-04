@@ -11,9 +11,17 @@ import com.tfg.utils.Constants;
 
 public class EsperStatementSubscriber {
 
+	// Topic
 	private String topic = "Observations";
+	
+	// MQTT Client
 	private MqttClient client;
+	
+	// QoS
 	private int qos = 1;
+	
+	// Current location for CEP
+	String curLocation = "Badajoz";
 
 	public EsperStatementSubscriber() throws MqttException {
 		// Set MQTT host
@@ -50,16 +58,16 @@ public class EsperStatementSubscriber {
 		// Send to middleware the observations
 		switch (obsName) {
 		case "o1":
-			this.client.publish(this.topic, new MqttMessage("People_Moving_HIGH".getBytes()));
+			this.client.publish(this.topic, new MqttMessage(("People_Moving_HIGH,"+curLocation).getBytes()));
 			break;
 		case "o2":
-			this.client.publish(this.topic, new MqttMessage("People_Moving_HIGH_NIGHT".getBytes()));
+			this.client.publish(this.topic, new MqttMessage(("People_Moving_HIGH_NIGHT,"+curLocation).getBytes()));
 			break;
 		case "o3":
-			this.client.publish(this.topic, new MqttMessage("Patrol_Moving_HIGH".getBytes()));
+			this.client.publish(this.topic, new MqttMessage(("Patrol_Moving_HIGH,"+curLocation).getBytes()));
 			break;
 		case "o4":
-			this.client.publish(this.topic, new MqttMessage("Patrol_Moving_LOW".getBytes()));
+			this.client.publish(this.topic, new MqttMessage(("Patrol_Moving_LOW,"+curLocation).getBytes()));
 			break;
 		default:
 			break;
