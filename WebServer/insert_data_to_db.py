@@ -1,9 +1,11 @@
 import datetime
 
-from .models import User, Role
+from .models import User, Role, Observation
 from werkzeug.security import generate_password_hash
 
-def insert_data(db):
+from .static.constants import DESCRIPTIONS
+
+def insert_user_data(db):
     ''' Insert data in the database
 
         Parameters:
@@ -143,3 +145,18 @@ def insert_data(db):
     db.session.add(user)
 
     db.session.commit()
+
+def insert_observation_data(db, obs):
+
+    try:
+        observation = Observation(
+            name = obs[0],
+            description = DESCRIPTIONS[obs[0]],
+            location = obs[1].strip()
+        )
+
+        db.session.add(observation)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+    print("Observation " + obs[0] + " inserted")

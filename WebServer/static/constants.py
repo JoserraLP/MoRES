@@ -9,3 +9,10 @@ RADIUS_ROLE = {
     'politician_admin_area': 1000000,
     'politician_locality': 10000
 }
+
+DESCRIPTIONS = {
+    "People_Moving_HIGH" : "People is actually moving a lot",
+    "People_Moving_HIGH_NIGHT" : "People is actually moving a lot by night",
+    "Patrol_Moving_HIGH" : "There are too many patrols moving",
+    "Patrol_Moving_LOW" : "There are not enough patrols moving",
+}

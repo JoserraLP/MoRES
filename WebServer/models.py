@@ -1,6 +1,8 @@
 from flask_login import UserMixin
 from . import db
 
+import datetime
+
 class User(UserMixin, db.Model):
     ''' Class representing a web server user
 
@@ -85,3 +87,24 @@ class UserRoles(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+
+class Observation(db.Model):
+    ''' Class representing a CEP observation
+
+    Attributes
+    ----------
+    id : int 
+        Observation identificator
+    name : str 
+        Observation name
+    description : str 
+        Observation description
+    location : str 
+        Observation location
+    '''
+    __tablename__ = 'observations'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(40))
+    description = db.Column(db.String(100))
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    location = db.Column(db.String(50))

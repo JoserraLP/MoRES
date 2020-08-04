@@ -8,58 +8,93 @@
 {% block content %}
   {% with messages = get_flashed_messages() %}
   {% if messages %}
-      <div class="notification is-danger">
+      <div class="alert alert-danger" role="alert">
           {{ messages[0] }}
       </div>
   {% else %}
-    <h1>Statistics</h1>
-    {% if data %}
-      <div class="margin-center">
-        <canvas id="chart" width="600" height="400"></canvas>
-        <script>
-          var data = JSON.parse('{{ data|safe }}');
-          var labels = []; 
-          var values = [];
-          for (var k in data){
-            labels.push(k);
-            values.push(data[k]);
-          }
 
-          // bar chart data
-          var barData = {
-            labels :  labels,
-            datasets : [
-              {
-                fillColor: "rgba(0,0,0,1)",
-                strokeColor: "rgba(255,255,255,1)",
-                pointColor: "rgba(151,187,205,1)",
-                data : values
-              }
-            ]
-          }
-    
-          // get bar chart canvas
-          var mychart = document.getElementById("chart").getContext("2d");
-    
-          var steps = 10;
-          var max = values[values.length-1];
+      <div class="row">
+        {% if data %}
+          <div class="col pt-3 pb-3">
+            <h1>Statistics</h1>
+            <p><b>Number of connected devices</b></p>
+            <div class="margin-center">
+              <canvas id="chart" width="600" height="400"></canvas>
+              <script>
+                var data = JSON.parse('{{ data|safe }}');
+                var labels = []; 
+                var values = [];
+                for (var k in data){
+                  labels.push(k);
+                  values.push(data[k]);
+                }
 
-          // draw bar chart
-          new Chart(mychart).Bar(barData, {
-            scaleOverride: true,
-            scaleSteps: steps,
-            scaleStepWidth: Math.ceil(max / steps),
-            scaleStartValue: 0,
-            scaleShowVerticalLines: true,
-            scaleShowGridLines : true,
-            barShowStroke : true,
-            scaleShowLabels: true
-          });
-        </script>
+                // bar chart data
+                var barData = {
+                  labels :  labels,
+                  datasets : [
+                    {
+                      fillColor: "rgba(0,0,0,1)",
+                      strokeColor: "rgba(255,255,255,1)",
+                      pointColor: "rgba(151,187,205,1)",
+                      data : values
+                    }
+                  ]
+                }
+          
+                // get bar chart canvas
+                var mychart = document.getElementById("chart").getContext("2d");
+          
+                var steps = 10;
+                var max = values[values.length-1];
+
+                // draw bar chart
+                new Chart(mychart).Bar(barData, {
+                  scaleOverride: true,
+                  scaleSteps: steps,
+                  scaleStepWidth: Math.ceil(max / steps),
+                  scaleStartValue: 0,
+                  scaleShowVerticalLines: true,
+                  scaleShowGridLines : true,
+                  barShowStroke : true,
+                  scaleShowLabels: true
+                });
+              </script>
+            </div>
+          </div>
+        {% else %}
+          <p class="notification is-danger"> The statistics cannot be loaded, please refresh the page</p>
+        {% endif %}
       </div>
-    {% else %}
-      <p class="alert-info"> The statistics cannot be loaded, please refresh the page</p>
-    {% endif %}
+      <div class="row">
+        {% if obs %}
+          <div class="col pt-3">
+            <h1>Last observations</h1>
+            <table class="table table-dark pt-5 mt-5">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in obs %}
+                  <tr>
+                    <td>{{ item['name'] }}</td>
+                    <td>{{ item['description'] }}</td>
+                    <td>{{ item['timestamp'] }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+        <div class="col pt-5" >
+          <div class="alert alert-danger" role="alert"> There are no observations</div>
+        </div>
+        {% endif %}
+      </div>
   {% endif %}
   {% endwith %}
 
