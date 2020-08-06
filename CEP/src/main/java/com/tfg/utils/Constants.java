@@ -12,6 +12,6 @@ package com.tfg.utils;
 
 public class Constants {
 	public static final String CONFIG_ESPER = "esper.cfg.xml";
-	public static final String MQTT_URL = "tcp://localhost:1883";
+	public static final String MQTT_URL = "tcp://90.169.70.108:1883";
 
 }
