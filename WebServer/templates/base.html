@@ -9,7 +9,11 @@
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" /> -->
     
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     {% block header_map %}
@@ -23,56 +27,43 @@
 
         <div class="container-fluid">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <div class="collapse navbar-collapse">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse"  id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                         <li class="nav-item ml-4 active">
-                            <a href="{{ url_for('main.index') }}" class="nav-link text-white">
-                                Home
-                            </a>
+                            <a href="{{ url_for('main.index') }}" class="nav-link text-white">Home</a>
                         </li>
                         {% if current_user.is_authenticated %}
                         <li class="nav-item ml-4 active">
-                            <a href="{{ url_for('main.profile') }}" class="nav-link text-white">
-                                Profile
-                            </a>
+                            <a href="{{ url_for('main.profile') }}" class="nav-link text-white">Profile</a>
                         </li>
                         <li class="nav-item ml-4 active">
-                            <a href="{{ url_for('map.show_map') }}" class="nav-link text-white">
-                                Map
-                            </a>
+                            <a href="{{ url_for('map.show_map') }}" class="nav-link text-white">Map</a>
                         </li>
                         {% if not current_user.has_roles(['police']) %}
                         <li class="nav-item ml-4 active">
-                            <a href="{{ url_for('allowed_places.allowed_places_types') }}" class="nav-link text-white">
-                                Allowed Places Types
-                            </a>
+                            <a href="{{ url_for('allowed_places.allowed_places_types') }}" class="nav-link text-white">Allowed Places Types</a>
                         </li>
                         <li class="nav-item ml-4 active">
-                            <a href="{{ url_for('statistics.show_statistics') }}" class="nav-link text-white">
-                                Statistics
-                            </a>
+                            <a href="{{ url_for('statistics.show_statistics') }}" class="nav-link text-white">Statistics</a>
                         </li>
                         {% endif %}
                         <li class="nav-item ml-4 active">
-                            <a href="{{ url_for('news.add_news') }}" class="nav-link text-white">
-                                Add news item
-                            </a>
+                            <a href="{{ url_for('news.add_news') }}" class="nav-link text-white">Add news item</a>
                         </li>
                         {% endif %}
                     </ul>
                     <ul class="navbar-nav ml-auto mt-2 mr-4 mt-lg-0">
                         {% if current_user.is_authenticated %}
                         <li class="nav-item mr-4 active">
-                            <a href="{{ url_for('auth.logout') }}" class="nav-link text-white">
-                                Logout
-                            </a>
+                            <a href="{{ url_for('auth.logout') }}" class="nav-link text-white">Logout</a>
                         </li>
                         {% endif %}
                         {% if not current_user.is_authenticated %}
                         <li class="nav-item mr-4 active">
-                            <a href="{{ url_for('auth.login') }}" class="nav-link">
-                                Login
-                            </a>
+                            <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
                         </li>
                         {% endif %}
                     </ul>

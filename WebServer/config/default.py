@@ -3,7 +3,7 @@
 SECRET_KEY = 'super_secret_key_for_testing_purpose'
 
 # -------------- MQTT -------------- #
-MQTT_BROKER_URL = '192.168.1.61'
+MQTT_BROKER_URL = '90.169.70.108'
 MQTT_BROKER_PORT = 1883
 
 # -------------- Flask-User -------------- #

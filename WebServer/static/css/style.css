@@ -7,8 +7,9 @@ html, body {
 }
 
 .map {
-    height: 500px; 
-    width: 600px;
+    position: absolute;
+    height: 75%; 
+    width: 100%;
 }
 
 .margin-center {
