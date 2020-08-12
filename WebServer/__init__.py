@@ -82,7 +82,7 @@ def create_app():
         db.create_all()
         # If there are no users and no roles create and insert them on the db
         if not User.query.limit(1).all() and not Role.query.limit(1).all():
-            from .insert_data_to_db import insert_user_data
+            from .utils.insert_data_to_db import insert_user_data
             insert_user_data(db)
 
     @mqtt.on_message()
@@ -91,7 +91,7 @@ def create_app():
             with app.app_context():
                 obs = str(message.payload.decode("utf-8")).split(',')
 
-                from .insert_data_to_db import insert_observation_data        
+                from .utils.insert_data_to_db import insert_observation_data        
                 
                 insert_observation_data(db, obs=obs)
 

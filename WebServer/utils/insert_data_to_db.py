@@ -1,9 +1,9 @@
 import datetime
 
-from .models import User, Role, Observation
+from ..models import User, Role, Observation
 from werkzeug.security import generate_password_hash
 
-from .static.constants import DESCRIPTIONS
+from ..static.constants import DESCRIPTIONS
 
 def insert_user_data(db):
     ''' Insert data in the database
