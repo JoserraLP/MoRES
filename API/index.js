@@ -26,7 +26,7 @@ mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
 
 // MQTT
 var mqtt = require('mqtt'); 
-var client = mqtt.connect("mqtt://192.168.1.61");
+var client = mqtt.connect("mqtt://90.169.70.108");
 
 client.on("connect", function(){
     console.log("Connected to MQTT Broker");
@@ -72,6 +72,29 @@ var oasTools = require('oas-tools');
 var jsyaml = require('js-yaml');
 const { parse } = require('path');
 var serverPort = 8080;
+
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
+var cors = require('cors');
+
+// use it before all route definitions
+app.use(cors({origin: '*'}));
 
 var spec = fs.readFileSync(path.join(__dirname, '/api/openapi.yaml'), 'utf8');
 var oasDoc = jsyaml.safeLoad(spec);

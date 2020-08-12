@@ -6,7 +6,7 @@ var mongoURL = "mongodb://localhost:27017/"
 
 // MQTT
 var mqtt = require('mqtt')
-var mqttClient = mqtt.connect('mqtt://192.168.1.61')
+var mqttClient = mqtt.connect('mqtt://90.169.70.108')
 
 mqttClient.on("connect", function(){
     console.log("Connected to MQTT Broker");
@@ -54,11 +54,13 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
     console.log("Request: " + JSON.stringify(req));
     mongoClient.connect(mongoURL, function(err, db) {
         if (err) throw err;
+
         var dbase = db.db("tfg");
         // Parameters values
         var location_type = req.location_type.value;
         var location = req.location.value; 
-        if (location_type && location){
+        if (location_type !== undefined && location !== undefined){
+
             var match_query = {};
             if (location_type == 'country')
                 match_query = { 'country': location };
@@ -67,7 +69,7 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
 
             dbase.collection("allowed_places_types").aggregate(
                 [
-                    {  $match: match_query },
+                    { $match: match_query },
                     { $project : // Exclude the _id field
                         {  
                             "_id": 0, 
@@ -102,10 +104,12 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
                     }
                 ]).toArray(function(err, result) {
                     if (err) throw err;
-                    console.log("Allowed places types: " + JSON.stringify(result));
+                    //console.log("Allowed places types: " + JSON.stringify(result));
+                    
                     res.send({
                         results: result
                     });
+                    
                 });
         }
     });
@@ -183,6 +187,11 @@ module.exports.putAllowedPlaceType = function(req, res, next) {
         dbase.collection("allowed_places_types").updateOne(query, values, function(err, response) {
             if (err) throw err;
             console.log("Updated type " + data.type);
+            
+            if (mqttClient.connected){
+                mqttClient.publish('AllowedPlacesTypes', "1");
+                console.log("Allowed places types updated");
+            }
 
             res.send({
                 message: "Allowed places types updated"

@@ -73,6 +73,11 @@ paths:
                 example: OK
                 title: OK
                 type: string
+            application/json:
+              schema:
+                example: OK
+                title: OK
+                type: string
           description: OK
         404:
           content:
@@ -360,6 +365,11 @@ paths:
         200:
           content:
             text/plain:
+              schema:
+                example: OK
+                title: OK
+                type: string
+            application/json:
               schema:
                 example: OK
                 title: OK

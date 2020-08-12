@@ -43,18 +43,16 @@ module.exports.getNearbyDevices = function(req, res, next) {
         }	
 
         var lastConnectTime = req.mins.value
-        if (lastConnectTime){
+        if (typeof lastConnectTime !== undefined){
             query.lastUpdate = { $gt : new Date(Date.now() - 1000 * 60 * lastConnectTime) };// lastConnectedTime Minutes
         }
 
         dbase.collection("device").find(query).toArray(function(err, result) {
             if (err) throw err;
-            console.log("Nearby devices: " + JSON.stringify(result));	
-            // To avoid frontend CORS error
-            res.setHeader('Access-Control-Allow-Origin', 'http://192.168.1.61:5000');
-            res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
+            //console.log("Nearby devices: " + JSON.stringify(result));	
             
-            if (req.type.value && req.type.value == 'geojson'){
+            
+            if (typeof req.type.value !== undefined  && req.type.value == 'geojson'){
                 var featuresData = [];
                 for (var key in result){
                     featuresData.push({
@@ -76,10 +74,10 @@ module.exports.getNearbyDevices = function(req, res, next) {
                     features: featuresData
                 });
             } else {
-                res.send({	
-                    results: result
-                })
-            };	
+                res.send({ 
+                    results: result 
+                });
+            }	
         });
     });
 };
