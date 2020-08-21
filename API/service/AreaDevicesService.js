@@ -37,7 +37,7 @@ module.exports.getAreaDevices = function(req, res, next) {
 
         var lastConnectTime = req.mins.value
         if (lastConnectTime){
-            query.lastUpdate = { $gt : new Date(Date.now() - 1000 * 60 * lastConnectTime) };// lastConnectedTime Minutes
+            query.lastUpdate = { $gt : new Date(Date.now() + 1000 * 60 * 60 * 2 - 1000 * 60 * lastConnectTime) };// lastConnectedTime Minutes
         }
 
         dbase.collection("device").countDocuments(query, function(err, result) {

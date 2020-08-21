@@ -42,24 +42,26 @@ client.subscribe('Location');
 client.on('message', function(topic, message, packet){
 	console.log("message is "+ message);
     console.log("topic is "+ topic);
-    mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
-        if (err) throw err;
-        var dbase = db.db("tfg");
-        message = JSON.parse(message);
-        var data = {
-            $set : {
-                lastUpdate: new Date(),
-                location: {
-                    type: "Point",
-                    coordinates: [message.geo_lat, message.geo_long]
+    if (topic == "Location"){
+        mongoClient.connect(mongoURL, mongoOptions, function(err, db) {
+            if (err) throw err;
+            var dbase = db.db("tfg");
+            message = JSON.parse(message);
+            var data = {
+                $set : {
+                    lastUpdate: new Date(Date.now() + 1000 * 60 * 60 * 2) ,
+                    location: {
+                        type: "Point",
+                        coordinates: [message.geo_lat, message.geo_long]
+                    }
                 }
             }
-        }
-        dbase.collection("device").updateOne({_id: mongodb.ObjectID(message._id)}, data, function(err) {
-            if (err) throw err;
-            console.log("Device location updated to " + message.geo_lat + " - " + message.geo_long);
-        }); 
-    });
+            dbase.collection("device").updateOne({_id: mongodb.ObjectID(message._id)}, data, function(err) {
+                if (err) throw err;
+                console.log("Device location updated to " + message.geo_lat + " - " + message.geo_long);
+            }); 
+        });
+    }
 });
 
 var express = require("express");

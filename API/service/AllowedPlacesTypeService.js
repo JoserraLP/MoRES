@@ -66,6 +66,8 @@ module.exports.getAllowedPlacesType = function(req, res, next) {
                 match_query = { 'country': location };
             else if (location_type == 'admin_area')
                 match_query = { 'admin_area': location};
+            else if (location_type == 'locality')
+                match_query = { 'locality': location };
 
             dbase.collection("allowed_places_types").aggregate(
                 [

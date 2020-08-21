@@ -44,12 +44,12 @@ module.exports.getNearbyDevices = function(req, res, next) {
 
         var lastConnectTime = req.mins.value
         if (typeof lastConnectTime !== undefined){
-            query.lastUpdate = { $gt : new Date(Date.now() - 1000 * 60 * lastConnectTime) };// lastConnectedTime Minutes
+            query.lastUpdate = { $gt : new Date(Date.now() + 1000 * 60 * 60 * 2 - 1000 * 60 * lastConnectTime) };// lastConnectedTime Minutes
         }
 
         dbase.collection("device").find(query).toArray(function(err, result) {
             if (err) throw err;
-            //console.log("Nearby devices: " + JSON.stringify(result));	
+            console.log("Nearby devices: " + JSON.stringify(result));	
             
             
             if (typeof req.type.value !== undefined  && req.type.value == 'geojson'){
