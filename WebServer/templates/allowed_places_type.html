@@ -13,12 +13,17 @@
         {% for results_row in results | batch(4, '&nbsp;') %}
         <div class="row">
           {% for item in results_row %}
-          {% if item['is_allowed'] %}
-          <div class="col bg-light-green mt-3 mb-3 ml-5 mr-5 p-2" data-id="{{item['type']}}" onclick="checkSelectedElem(this)">
-            <input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" hidden checked>
+          {% if item['block'] %}
+          <div class="col bg-gray mt-3 mb-3 ml-5 mr-5 p-2">
+            <input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" hidden disabled>
           {% else %}
-          <div class="col bg-salmon mt-3 mb-3 ml-5 mr-5 p-2" data-id="{{item['type']}}" onclick="checkSelectedElem(this)">
-            <input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" hidden>
+            {% if item['is_allowed'] %}
+            <div class="col bg-light-green mt-3 mb-3 ml-5 mr-5 p-2" data-id="{{item['type']}}" onclick="checkSelectedElem(this)">
+              <input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" hidden checked>
+            {% else %}
+            <div class="col bg-salmon mt-3 mb-3 ml-5 mr-5 p-2" data-id="{{item['type']}}" onclick="checkSelectedElem(this)">
+              <input type="checkbox" name="allowed_places_types" value="{{item}}" id="{{item['type']}}" hidden>
+            {% endif %}
           {% endif %}
             <div class="row">
               <div class="col-3"><img src="{{item['icon']}}" width="50" height="50"></div>
@@ -28,12 +33,14 @@
           {% endfor %}
         </div>
         {% endfor %}
-        <div class="pt-3 pb-3">
-          <input class="btn btn-dark" type="submit" value="Update">
+        <div class="row">
+          <div class="col">
+            <input class="btn btn-dark" type="submit" value="Update">
+          </div>
         </div>
       </form>
     {% else %}
-      <p>Allowed places types cannot be loaded, please refresh the page</p>
+      <p class="pt-5 mt-5"> Allowed places types cannot be loaded, please refresh the page</p>
     {% endif %}
   {% endif %}
   {% endwith %}

@@ -59,7 +59,7 @@ def show_map():
                 # Remote IP loaded
 
                 # Set the params to make the request
-                params = {'lat': cur_location['lat'], 'lng': cur_location['lon'], 'rad': 1000}
+                params = {'lat': cur_location['lat'], 'lng': cur_location['lon'], 'rad': 10000}
                 
                 return render_template('map.html', data=params, cur_location=cur_location['city'], user_roles=json_roles, zoom=12)
                 

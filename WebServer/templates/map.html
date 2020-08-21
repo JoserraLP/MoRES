@@ -30,10 +30,10 @@
         maxZoom: 18
     }).addTo(map);
 
-    var url = 'http://90.169.70.108:8080/nearby_devices?lat={{data["lat"]}}&lng={{data["lng"]}}&rad={{data["rad"]}}&type=geojson' 
+    var url = 'http://90.169.70.108:8080/nearby_devices?lat={{data["lat"]}}&lng={{data["lng"]}}&rad={{data["rad"]}}&type=geojson&mins=5' 
 
     var device_location_layer = L.realtime(url, {
-        interval: 3 * 1000,
+        interval: 5 * 1000,
         getFeatureId: function(f) {
             return f.properties.id;
         },

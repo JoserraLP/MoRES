@@ -43,24 +43,25 @@ def check_places_by_user_location(allowed_places_types, user_location):
     current_user_roles = [role.name for role in current_user.roles]
 
     for elem in allowed_places_types:
-        # Check if the role is admin or politician_country to check the country field
-        if 'politician_country' in current_user_roles or 'admin' in current_user_roles:
-            for country in elem['country']:
-                if user_location == country:
-                    # If the place type is allowed in the country
-                    elem['is_allowed'] = True
-        # Check if the role is politician_admin_area to check the admin_area field
-        elif 'politician_admin_area' in current_user_roles: 
-            for admin_area in elem['admin_area']:
-                if user_location == admin_area:
-                    # If the place type is allowed in the admin_area
-                    elem['is_allowed'] = True
-        # Check if the role is politician_locality or police to check the locality field
-        elif 'politician_locality' in current_user_roles or 'police' in current_user_roles:
-            for locality in elem['locality']:
-                if user_location == locality:
-                    # If the place type is allowed in the locality
-                    elem['is_allowed'] = True
+        if 'block' not in elem:
+            # Check if the role is admin or politician_country to check the country field
+            if 'politician_country' in current_user_roles or 'admin' in current_user_roles:
+                for country in elem['country']:
+                    if user_location == country:
+                        # If the place type is allowed in the country
+                        elem['is_allowed'] = True
+            # Check if the role is politician_admin_area to check the admin_area field
+            elif 'politician_admin_area' in current_user_roles: 
+                for admin_area in elem['admin_area']:
+                    if user_location == admin_area:
+                        # If the place type is allowed in the admin_area
+                        elem['is_allowed'] = True
+            # Check if the role is politician_locality or police to check the locality field
+            elif 'politician_locality' in current_user_roles or 'police' in current_user_roles:
+                for locality in elem['locality']:
+                    if user_location == locality:
+                        # If the place type is allowed in the locality
+                        elem['is_allowed'] = True
     return allowed_places_types
                     
 def get_allowed_places_types_by_current_user_roles():
@@ -105,13 +106,38 @@ def get_allowed_places_types_by_current_user_roles():
         }
 
     # Make the request to the API with the params
-    r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types', params=params)
+    places_r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types', params=params)
+
+    # Make the request to the API for all the allowed places
+    all_places_r_server_api = requests.get(SERVER_API_URL + '/allowed_places_types')
+
+    # Compare results
+    places_results = compare_results (all_places_r_server_api.json()['results'], places_r_server_api.json()['results'])
 
     # Order the results
-    ordered_response = sorted(r_server_api.json()['results'], key = lambda x : (x['icon'], x['title']))
+    ordered_response = sorted(places_results, key = lambda x : (x['icon'], x['title']))
 
     return ordered_response
 
+def compare_results(all_places_results, places_results):
+    ''' Compare both results and return the list with the values
+
+        Parameters:
+            all_places_results (list[object]): 
+                List with all places stored in the API
+            places_results (list[object]): 
+                List with places allowed in a specific place
+
+        Returns:
+            places_results (list[object]): List with all the compared results 
+    '''
+    for item in all_places_results:
+        if item not in places_results:
+            item['is_allowed'] = False
+            item['block'] = True
+            places_results.append(item)
+
+    return places_results
 
 def retrieve_allowed_places_types():
     ''' Retrieve allowed places types from the API and show them in the allowed places types selection page

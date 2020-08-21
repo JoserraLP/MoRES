@@ -1,7 +1,7 @@
 html, body {
     height: 100%;
 }
-  
+
 .full-height {
     height: 100%;
 }
@@ -22,4 +22,14 @@ html, body {
 
 .bg-light-green {
     background: rgb(144, 238, 144);
+}
+
+.bg-gray {
+    background: rgb(195, 194, 194);
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
