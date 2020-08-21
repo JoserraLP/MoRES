@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey;
 @Entity
 public class News {
 
-    @PrimaryKey
+    @PrimaryKey (autoGenerate = true)
     private Integer id;
 
     @ColumnInfo(name = "title")
@@ -40,7 +40,6 @@ public class News {
      * News empty constructor
      */
     public News() {
-        this.id = -1;
         this.title = "";
         this.author = "";
         this.date = "";
@@ -53,7 +52,6 @@ public class News {
 
     /**
      * News parametrized constructor
-     * @param id News ID
      * @param title News title
      * @param author News author
      * @param date News date
@@ -64,8 +62,7 @@ public class News {
      * @param relevance News relevance
      */
     @Ignore
-    public News(Integer id, String title, String author, String date, String description, String image, String location, String expansion, int relevance) {
-        this.id = id;
+    public News(String title, String author, String date, String description, String image, String location, String expansion, int relevance) {
         this.title = title;
         this.author = author;
         this.date = date;

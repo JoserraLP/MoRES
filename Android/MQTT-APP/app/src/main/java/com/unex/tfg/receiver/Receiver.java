@@ -22,6 +22,7 @@ import com.unex.tfg.data.repository.NewsRepository;
 import com.unex.tfg.model.News;
 import com.unex.tfg.service.ForegroundService;
 import com.unex.tfg.utils.Constants;
+import com.unex.tfg.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +30,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class Receiver extends BroadcastReceiver {
@@ -48,12 +50,16 @@ public class Receiver extends BroadcastReceiver {
     // MQTT client
     private MQTTClient mqttClient;
 
+    // Load allowed places types flag
+    private boolean loadAllowedPlacesTypes;
+
     /**
      * Receiver constructor
      * @param application Application
      */
     public Receiver(Application application){
         this.application = application;
+        this.loadAllowedPlacesTypes = true;
         // Get MQTT Client instance
         mqttClient = MQTTClient.getInstance(application.getApplicationContext());
 
@@ -113,8 +119,13 @@ public class Receiver extends BroadcastReceiver {
 
         Location location = intent.getParcelableExtra(ForegroundService.EXTRA_LOCATION);
         // Receive a new location
-        if (location != null)
-            onLocationReceived(location);
+        if (location != null) {
+            try {
+                onLocationReceived(location, context);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         String news = intent.getStringExtra(MQTTClient.EXTRA_NEWS);
         // Receive a news item from MQTT
@@ -127,16 +138,20 @@ public class Receiver extends BroadcastReceiver {
         // Receive an update notification from MQTT
         if (allowedPlacesTypes == 1) {
             Log.d(TAG, "Loading new allowed places types");
+
+            String locality = getLocalityByLocation(context, curLocation);
+
             // Load the updated allowed places types
-            AllowedPlacesTypeRepository.getInstance(this.application).loadAllAllowedPlacesTypes();
+            AllowedPlacesTypeRepository.getInstance(this.application).loadAllAllowedPlacesTypes(locality);
         }
     }
 
     /**
      * Process the received location and publish it through MQTT
      * @param location Received location
+     * @param context Receiver context
      */
-    private void onLocationReceived(Location location){
+    private void onLocationReceived(Location location, Context context) throws IOException {
         Log.d(TAG, location.toString());
         if (curLocation != null) {
             if (curLocation.getLongitude() != location.getLongitude() && curLocation.getLatitude() != location.getLatitude()) {
@@ -144,7 +159,9 @@ public class Receiver extends BroadcastReceiver {
                 // update the current location
                 curLocation = location;
 
+                // Save the device ID on the preferences of the app
                 SharedPreferences pref = application.getSharedPreferences(Constants.PREFERENCES_NAME, Constants.PREFERENCES_MODE);
+
                 String deviceID = pref.getString(Constants.PREFERENCES_DEVICE_ID, null);
                 if (deviceID != null) {
                     // If the device has an ID
@@ -161,6 +178,15 @@ public class Receiver extends BroadcastReceiver {
             }
         } else
             curLocation = location;
+
+        if (loadAllowedPlacesTypes && curLocation != null){
+
+            loadAllowedPlacesTypes = false;
+            String locality = getLocalityByLocation(context, curLocation);
+
+            // Load the updated allowed places types
+            AllowedPlacesTypeRepository.getInstance(this.application).loadAllAllowedPlacesTypes(locality);
+        }
     }
 
     /**
@@ -244,6 +270,27 @@ public class Receiver extends BroadcastReceiver {
         newsItem.setExpansion(jsonObject.getString("expansion"));
 
         return newsItem;
+    }
+
+    /**
+     * Get locality name by current location
+     * @param context Application context
+     * @param curLocation Current device location
+     * @return String with the locality
+     */
+    public String getLocalityByLocation (Context context, Location curLocation){
+        // Create a Geocoder instance
+        Geocoder geocoder = new Geocoder(context);
+        // Get the address of the current location
+        List<Address> addresses;
+        try {
+            addresses = geocoder.getFromLocation(curLocation.getLatitude(), curLocation.getLongitude(), 1);
+            return addresses.get(0).getLocality();
+        } catch (IOException e) {
+            Log.e(TAG, Objects.requireNonNull(e.getLocalizedMessage()));
+        }
+
+        return "";
     }
 }
 

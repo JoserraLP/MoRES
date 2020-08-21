@@ -2,6 +2,7 @@ package com.unex.tfg.ui.news;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +73,10 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
         holder.newsTitle.setText(newsItem.getTitle());
         holder.newsDate.setText(newsItem.getDate());
 
+        if (newsItem.getRelevance() == 1){
+            holder.linearLayout.setBackgroundColor(Color.rgb(245, 227, 153));
+        }
+
         if(newsItem.getImage() != null)
             Glide.with(context)
                 .load(newsItem.getImage())
@@ -84,6 +89,7 @@ public class ListNewsAdapter extends RecyclerView.Adapter<ListNewsAdapter.ViewHo
             newsViewModel.select(newsItem);
             Navigation.findNavController((Activity) context, R.id.nav_host_fragment).navigate(R.id.nav_news_item);
         });
+
     }
 
     /**

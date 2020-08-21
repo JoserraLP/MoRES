@@ -343,7 +343,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // If the fragment is attached to an activity
         if (isAdded()) {
             // Load the nearby devices by the current location
-            NearbyDevicesRepository.getInstance(requireActivity().getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS);
+            NearbyDevicesRepository.getInstance(requireActivity().getApplication()).loadNearbyDevices(curLocation.getLatitude(), curLocation.getLongitude(), Constants.NEARBY_DEVICES_RADIUS, Constants.NEARBY_DEVICES_MINS);
 
             // Get all the nearby devices
             nearbyDevicesViewModel.getNearbyDevices().observe(requireActivity(), allNearbyDevices -> {

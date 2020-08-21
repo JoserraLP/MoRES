@@ -12,8 +12,9 @@ public interface NearbyDevicesService {
      * @param lat Center latitude
      * @param lng Center longitude
      * @param rad Radius
+     * @param mins Minutes
      * @return A Call with the server response
      */
     @GET("nearby_devices")
-    Call<NearbyDevicesResponse>getNearbyDevices(@Query("lat") double lat, @Query("lng") double lng, @Query("rad") double rad);
+    Call<NearbyDevicesResponse>getNearbyDevices(@Query("lat") double lat, @Query("lng") double lng, @Query("rad") double rad, @Query("mins") int mins);
 }

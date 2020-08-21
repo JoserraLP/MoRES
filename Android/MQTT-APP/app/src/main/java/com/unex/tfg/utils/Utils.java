@@ -2,13 +2,17 @@ package com.unex.tfg.utils;
 
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.preference.PreferenceManager;
 
 import com.unex.tfg.R;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 @SuppressWarnings("ALL")
 public class Utils {

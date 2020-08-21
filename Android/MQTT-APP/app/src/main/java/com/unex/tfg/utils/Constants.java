@@ -6,7 +6,7 @@ import android.graphics.Color;
 public class Constants {
 
     /** MQTT **/
-    public static String MQTT_BROKER_URL = "tcp://192.168.1.83:1883";
+    public static String MQTT_BROKER_URL = "tcp://90.169.70.108:1883";
 
     public static int MQTT_QOS = 0;
 
@@ -17,9 +17,11 @@ public class Constants {
     public static String MQTT_TOPIC_LOCATION = "Location";
 
     /** Server API **/
-    public static String API_SERVER_URL = "http://192.168.1.83:8080/";
+    public static String API_SERVER_URL = "http://90.169.70.108:8080/";
 
     public static double NEARBY_DEVICES_RADIUS = 100;
+
+    public static int NEARBY_DEVICES_MINS = 5;
 
     public static int NEARBY_ALLOWED_PLACES_MIN_DISTANCE = 200;
 
@@ -77,4 +79,7 @@ public class Constants {
     public static double BATTERY_UPPER_BOUND = 70.0;
 
     public static double BATTERY_LOWER_BOUND = 30.0;
+
+    /** Allowed Places Types Location **/
+    public static String LOCATION_TYPE = "locality";
 }

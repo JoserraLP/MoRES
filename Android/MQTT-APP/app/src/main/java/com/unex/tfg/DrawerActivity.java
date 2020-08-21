@@ -105,8 +105,6 @@ public class DrawerActivity extends AppCompatActivity {
             // Load the device ID
             DeviceIDRepository.getInstance(getApplication()).loadDeviceID();
 
-            // Load all the allowed places
-            AllowedPlacesTypeRepository.getInstance(getApplication()).loadAllAllowedPlacesTypes();
         }
 
         // Check app language and set it on the app
@@ -270,7 +268,8 @@ public class DrawerActivity extends AppCompatActivity {
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission was granted.
                 // Request location updates of the foreground service
-                mService.requestLocationUpdates();
+                if (mService != null)
+                    mService.requestLocationUpdates();
             } else {
                 // Permission denied.
                 Log.i(TAG, "Permission denied.");

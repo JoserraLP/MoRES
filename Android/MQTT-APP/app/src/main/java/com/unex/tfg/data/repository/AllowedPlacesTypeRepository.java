@@ -1,6 +1,7 @@
 package com.unex.tfg.data.repository;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,8 +10,10 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.unex.tfg.data.local.AppDatabase;
 import com.unex.tfg.data.remote.AllowedPlacesTypeResponse;
+import com.unex.tfg.data.remote.AllowedPlacesTypeResponseItem;
 import com.unex.tfg.data.remote.ServerRetrofitClient;
 import com.unex.tfg.model.AllowedPlacesType;
+import com.unex.tfg.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +68,10 @@ public class AllowedPlacesTypeRepository {
     /**
      * Load the allowed places types from the API and stores it in the database
      */
-    public void loadAllAllowedPlacesTypes() {
+    public void loadAllAllowedPlacesTypes(String curLocality) {
+
         // Make the retrofit call to the service
-        Call<AllowedPlacesTypeResponse> allowedPlacesTypeResponseCall = retrofit.getAllowedPlacesTypeServiceAPI().getAllowedPlacesType();
+        Call<AllowedPlacesTypeResponse> allowedPlacesTypeResponseCall = retrofit.getAllowedPlacesTypeServiceAPI().getAllowedPlacesType(Constants.LOCATION_TYPE, curLocality);
 
         // Enqueue the response
         allowedPlacesTypeResponseCall.enqueue(new Callback<AllowedPlacesTypeResponse>() {
@@ -78,21 +82,39 @@ public class AllowedPlacesTypeRepository {
                     AllowedPlacesTypeResponse allowedPlacesTypeResponse = response.body();
                     assert allowedPlacesTypeResponse != null;
                     // Retrieve the results of the body
-                    ArrayList<AllowedPlacesType> listAllowedPlacesTypes = allowedPlacesTypeResponse.getResults();
-                    for (AllowedPlacesType placeType : listAllowedPlacesTypes) {
-                        // Set the check status to true
-                        placeType.setChecked(true);
-                        // Insert the allowed place type on the database
-                        insertAllowedPlaceType(new MutableLiveData<>(placeType));
+                    ArrayList<AllowedPlacesTypeResponseItem> listAllowedPlacesType = allowedPlacesTypeResponse.getResults();
+                    if (!listAllowedPlacesType.isEmpty()) {
+                        for (AllowedPlacesTypeResponseItem allowedPlacesTypeResponseItem : listAllowedPlacesType) {
+                            AllowedPlacesType parsedPlaceType = processResponseItem(allowedPlacesTypeResponseItem);
+                            // Insert the allowed place type on the database
+                            insertAllowedPlaceType(new MutableLiveData<>(parsedPlaceType));
+                        }
                     }
                 }
             }
+
 
             @Override
             public void onFailure(@NonNull Call<AllowedPlacesTypeResponse> call, @NonNull Throwable t) {
                 Log.d(TAG, Objects.requireNonNull(t.getMessage()));
             }
         });
+    }
+
+    /**
+     * Parse a AllowedPlacesTypeResponseItem object to a AllowedPlacesType object
+     * @param allowedPlacesTypeResponseItem AllowedPlacesTypeResponseItem object
+     * @return Parsed AllowedPlacesType object
+     */
+    private AllowedPlacesType processResponseItem (AllowedPlacesTypeResponseItem allowedPlacesTypeResponseItem){
+        AllowedPlacesType allowedPlacesType = new AllowedPlacesType();
+
+        allowedPlacesType.setChecked(true);
+        allowedPlacesType.setIcon(allowedPlacesTypeResponseItem.getIcon());
+        allowedPlacesType.setTitle(allowedPlacesTypeResponseItem.getTitle());
+        allowedPlacesType.setType(allowedPlacesTypeResponseItem.getType());
+
+        return allowedPlacesType;
     }
 
     /**

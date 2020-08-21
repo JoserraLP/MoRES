@@ -4,6 +4,9 @@ package com.unex.tfg.data.remote;
 
 import com.unex.tfg.utils.Constants;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -15,6 +18,13 @@ public class ServerRetrofitClient {
     // Singleton class instance
     private static ServerRetrofitClient mInstance;
 
+    // okHttpClient
+    private static OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .build();
+
     // Retrofit variable
     private Retrofit retrofit;
 
@@ -25,6 +35,7 @@ public class ServerRetrofitClient {
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }

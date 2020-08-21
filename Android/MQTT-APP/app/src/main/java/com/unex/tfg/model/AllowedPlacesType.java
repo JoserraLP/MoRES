@@ -47,9 +47,10 @@ public class AllowedPlacesType {
      * @param type AllowedPlacesType type
      * @param title AllowedPlacesType title
      * @param icon AllowedPlacesType icon
+     * @param locality AllowedPlacesType locality
      */
     @Ignore
-    public AllowedPlacesType(@NonNull String type, @NonNull String title, String icon) {
+    public AllowedPlacesType(@NonNull String type, @NonNull String title, String icon, String locality) {
         this.type = type;
         this.title = title;
         this.isChecked = false;
