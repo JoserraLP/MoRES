@@ -1,4 +1,4 @@
-module TFG2;
+module TFG;
 import com.tfg.enums.*;
 create objectarray schema peopleMovingEvent(ts long) starttimestamp ts endtimestamp ts;
 create objectarray schema peopleMoving(val peopleMoving,ts long) starttimestamp ts endtimestamp ts;
