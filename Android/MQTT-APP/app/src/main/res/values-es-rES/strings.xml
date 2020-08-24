@@ -36,4 +36,11 @@
         <item>Español</item>
         <item>Inglés</item>
     </string-array>
+
+    <string name="menu_about">Acerca</string>
+
+    <string name="about_app">
+        Esta aplicación usa la ubicación de tu dispositivo de forma anónima.\n\n
+        Toda tu informacion será tratada según la ley de protección de datos a nivel europeo.\n\n
+        Es posible denegar el acceso a la localización desde la pestaña de ajustes de tu dispositivo.</string>
 </resources>

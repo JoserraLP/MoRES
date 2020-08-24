@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.about.AboutFragment">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        tools:ignore="UselessParent">
+
+        <TextView
+            android:layout_marginTop="32dp"
+            android:paddingTop="16dp"
+            android:textSize="16sp"
+            android:id="@+id/about_app"
+            android:layout_width="327dp"
+            android:layout_height="151dp"
+            android:text="@string/about_app"
+            android:lines="12"/>
+
+    </LinearLayout>
+
+</LinearLayout>

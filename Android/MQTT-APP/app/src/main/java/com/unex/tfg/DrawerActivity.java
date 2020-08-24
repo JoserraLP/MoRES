@@ -23,12 +23,10 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-
-import com.unex.tfg.data.repository.AllowedPlacesTypeRepository;
-import com.unex.tfg.data.repository.DeviceIDRepository;
-import com.unex.tfg.service.ForegroundService;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.unex.tfg.data.repository.DeviceIDRepository;
+import com.unex.tfg.service.ForegroundService;
 import com.unex.tfg.utils.Constants;
 
 import java.util.Locale;

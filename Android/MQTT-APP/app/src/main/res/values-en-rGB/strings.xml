@@ -36,4 +36,11 @@
         <item>English</item>
         <item>Spanish</item>
     </string-array>
+
+    <string name="menu_about">About</string>
+
+    <string name="about_app">
+        This application uses the location of your device location anonymously.\n\n
+        All your information will be treated according to the European data protection law.\n\n
+        It is possible to deny access to the location from the settings tab of your device.</string>
 </resources>

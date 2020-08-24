@@ -23,5 +23,10 @@
             android:icon="@android:drawable/ic_menu_help"
             android:title="@string/menu_settings" />
 
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/menu_about" />
+
     </group>
 </menu>
