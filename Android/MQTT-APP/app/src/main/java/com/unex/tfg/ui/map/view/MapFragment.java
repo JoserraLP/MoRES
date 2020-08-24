@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -21,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.unex.tfg.R;
 import com.unex.tfg.data.repository.AllowedPlacesRepository;
 import com.unex.tfg.data.repository.NearbyDevicesRepository;
@@ -195,6 +197,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // If the current location is known make zoom on it
         zoomInCurLocation();
+
+        try {
+            boolean success = map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style.", e);
+        }
     }
 
     /**
