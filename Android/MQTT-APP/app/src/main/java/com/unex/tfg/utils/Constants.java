@@ -60,18 +60,18 @@ public class Constants {
 
     public static String PREFERENCES_LANGUAGE = "Language";
 
-    public static String PREFERENCES_LANGUAGE_DEF_VALUE = "es";
+    public static String PREFERENCES_LANGUAGE_DEF_VALUE = "en";
 
     /** Location Request **/
     public static long UPPER_UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
 
     public static long UPPER_FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPPER_UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
-    public static long MID_UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 60;
+    public static long MID_UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 20;
 
     public static long MID_FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = MID_UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
-    public static long LOWER_UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 60 * 2;
+    public static long LOWER_UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 60;
 
     public static long LOWER_FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = LOWER_UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
