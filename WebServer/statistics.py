@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect
 from flask_login import current_user
 from flask_user import roles_required
+from sqlalchemy import desc
 from .static.constants import SERVER_API_URL
 from . import geolocator, mqtt
 
@@ -57,7 +58,7 @@ def show_statistics():
         json_data = json.dumps(data)
 
         # Search observations in the db
-        observations = Observation.query.filter_by(location=current_user.location).order_by(Observation.timestamp)
+        observations = Observation.query.filter_by(location=current_user.location).order_by(desc(Observation.timestamp))
 
         json_obs = { "data" : []}
         for obs in observations:
