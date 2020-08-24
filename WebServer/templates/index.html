@@ -7,6 +7,13 @@
       COVID-19 Information Web Page
     </h1>
   </div>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+      <div class="alert alert-danger" role="alert">
+          {{ messages[0] }}
+      </div>
+  {% endif %}
+  {% endwith %}
   <div class="p-2 mt-5">
     <p class="lead">
       Website for authority forces and political leaders
