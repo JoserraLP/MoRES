@@ -4,16 +4,16 @@ import json
 
 client = mqtt.Client("News_Publisher")
 
-client.connect("192.168.1.83", port=1883)
+client.connect("90.169.70.108", port=1883)
 
 payload = json.dumps({ 
-  "title": "Patata-Sp",
+  "title": "News_Test_Caceres",
   "date": "07/05/2020",
   "author": "JoserraLP",
   "description": "This is the first description",
   "location": "Caceres",
   "expansion": "Locality",
-  "image": "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg",
+  "image": "https://www.cancer.org/es/noticias-recientes/preguntas-comunes-acerca-del-brote-del-nuevo-coronavirus/_jcr_content/par/image.img.jpg/1586550990157.jpg",
   "relevance" : 0
 })
 
