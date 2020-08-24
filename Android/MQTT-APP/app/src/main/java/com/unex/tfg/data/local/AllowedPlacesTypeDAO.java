@@ -35,4 +35,11 @@ public interface AllowedPlacesTypeDAO {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(AllowedPlacesType allowedPlacesType);
 
+
+    /**
+     * Delete all the AllowedPlacesType on the DB
+     */
+    @Query("DELETE FROM AllowedPlacesType")
+    void deleteAll();
+
 }

@@ -78,6 +78,9 @@ public class AllowedPlacesTypeRepository {
             @Override
             public void onResponse(@NonNull Call<AllowedPlacesTypeResponse> call, @NonNull Response<AllowedPlacesTypeResponse> response) {
                 if (response.isSuccessful()) {
+                    // Delete previous elements
+                    deleteAllAllowedPlacesTypes();
+
                     // Retrieve the response body
                     AllowedPlacesTypeResponse allowedPlacesTypeResponse = response.body();
                     assert allowedPlacesTypeResponse != null;
@@ -131,6 +134,13 @@ public class AllowedPlacesTypeRepository {
      */
     public void updateAllowedPlaceType(LiveData<AllowedPlacesType> allowedPlaceType){
         AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesTypeDAO().update(allowedPlaceType.getValue()));
+    }
+
+    /**
+     * Delete all the allowed places types stored in the database
+     */
+    private void deleteAllAllowedPlacesTypes() {
+        AppDatabase.databaseWriteExecutor.execute(() -> database.getAllowedPlacesTypeDAO().deleteAll());
     }
 
 }
