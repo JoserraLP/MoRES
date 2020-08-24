@@ -128,8 +128,8 @@ public class SubscriberPatrol implements MqttCallback {
 		// Get patrol coordinates
 		JSONObject patrolCoordinates = new JSONObject(val); 
 		
-		if ((patrolCoordinates.getDouble("lat") >= badajozCoordinates.getDouble(0)) || patrolCoordinates.getDouble("lat") <= badajozCoordinates.getDouble(1) && 
-			(patrolCoordinates.getDouble("lng") >= badajozCoordinates.getDouble(2)) || patrolCoordinates.getDouble("lng") <= badajozCoordinates.getDouble(3)) {
+		if (patrolCoordinates.getDouble("lat") >= badajozCoordinates.getDouble(0) && patrolCoordinates.getDouble("lat") <= badajozCoordinates.getDouble(1) &&
+			patrolCoordinates.getDouble("lng") >= badajozCoordinates.getDouble(2) && patrolCoordinates.getDouble("lng") <= badajozCoordinates.getDouble(3)) {
 			// Inside Badajoz
 			
 			System.out.println("Patrol Inside Badajoz");

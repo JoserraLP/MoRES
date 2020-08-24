@@ -131,8 +131,8 @@ public class SubscriberDeviceLocation implements MqttCallback {
 		// Get device coordinates
 		JSONObject deviceCoordinates = new JSONObject(val); 
 		
-		if ((deviceCoordinates.getDouble("lat") >= badajozCoordinates.getDouble(0)) || deviceCoordinates.getDouble("lat") <= badajozCoordinates.getDouble(1) && 
-			(deviceCoordinates.getDouble("lng") >= badajozCoordinates.getDouble(2)) || deviceCoordinates.getDouble("lng") <= badajozCoordinates.getDouble(3)) {
+		if (deviceCoordinates.getDouble("lat") >= badajozCoordinates.getDouble(0) && deviceCoordinates.getDouble("lat") <= badajozCoordinates.getDouble(1) &&
+				deviceCoordinates.getDouble("lng") >= badajozCoordinates.getDouble(2) && deviceCoordinates.getDouble("lng") <= badajozCoordinates.getDouble(3)) {
 			// Inside Badajoz
 			
 			System.out.println("Device Inside Badajoz");
