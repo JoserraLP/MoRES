@@ -128,21 +128,24 @@ public class SubscriberPatrol implements MqttCallback {
 		// Get patrol coordinates
 		JSONObject patrolCoordinates = new JSONObject(val); 
 		
-		if (patrolCoordinates.getDouble("lat") >= badajozCoordinates.getDouble(0) && patrolCoordinates.getDouble("lat") <= badajozCoordinates.getDouble(1) &&
-			patrolCoordinates.getDouble("lng") >= badajozCoordinates.getDouble(2) && patrolCoordinates.getDouble("lng") <= badajozCoordinates.getDouble(3)) {
-			// Inside Badajoz
-			
-			System.out.println("Patrol Inside Badajoz");
-			
-			// Get current time millis
-			long ts = System.currentTimeMillis(); 
-			
-			// Set the event
-	     	event[0] = ts;
-	     	
-	     	// Send event to the runtime engine
-			runtimeEngine.sendEvent(event,"patrolMovingEvent");
-			
+		if (patrolCoordinates.has("lat") && patrolCoordinates.has("lng")) {
+		
+			if (patrolCoordinates.getDouble("lat") >= badajozCoordinates.getDouble(0) && patrolCoordinates.getDouble("lat") <= badajozCoordinates.getDouble(1) &&
+				patrolCoordinates.getDouble("lng") >= badajozCoordinates.getDouble(2) && patrolCoordinates.getDouble("lng") <= badajozCoordinates.getDouble(3)) {
+				// Inside Badajoz
+				
+				System.out.println("Patrol Inside Badajoz");
+				
+				// Get current time millis
+				long ts = System.currentTimeMillis(); 
+				
+				// Set the event
+		     	event[0] = ts;
+		     	
+		     	// Send event to the runtime engine
+				runtimeEngine.sendEvent(event,"patrolMovingEvent");
+				
+			}
 		}
 
 	}

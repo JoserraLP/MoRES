@@ -130,28 +130,29 @@ public class SubscriberDeviceLocation implements MqttCallback {
 		
 		// Get device coordinates
 		JSONObject deviceCoordinates = new JSONObject(val); 
-		
-		if (deviceCoordinates.getDouble("lat") >= badajozCoordinates.getDouble(0) && deviceCoordinates.getDouble("lat") <= badajozCoordinates.getDouble(1) &&
-				deviceCoordinates.getDouble("lng") >= badajozCoordinates.getDouble(2) && deviceCoordinates.getDouble("lng") <= badajozCoordinates.getDouble(3)) {
-			// Inside Badajoz
-			
-			System.out.println("Device Inside Badajoz");
-			
-			// Get current time millis
-			long ts = System.currentTimeMillis();
-			
-			// Set the event
-	     	event[0] = ts;
-	     	
-	     	// Send event to the runtime engine
-			runtimeEngine.sendEvent(event,"peopleMovingEvent");
-			
-			// Set the event with the timezone
-			event[0] = getCurrentTimeZone(ts);
-			
-			// Send event to the runtime engine
-			runtimeEngine.sendEvent(event,"timezone");
-			
+		if (deviceCoordinates.has("lat") && deviceCoordinates.has("lng")) {
+			if (deviceCoordinates.getDouble("lat") >= badajozCoordinates.getDouble(0) && deviceCoordinates.getDouble("lat") <= badajozCoordinates.getDouble(1) &&
+					deviceCoordinates.getDouble("lng") >= badajozCoordinates.getDouble(2) && deviceCoordinates.getDouble("lng") <= badajozCoordinates.getDouble(3)) {
+				// Inside Badajoz
+				
+				System.out.println("Device Inside Badajoz");
+				
+				// Get current time millis
+				long ts = System.currentTimeMillis();
+				
+				// Set the event
+		     	event[0] = ts;
+		     	
+		     	// Send event to the runtime engine
+				runtimeEngine.sendEvent(event,"peopleMovingEvent");
+				
+				// Set the event with the timezone
+				event[0] = getCurrentTimeZone(ts);
+				
+				// Send event to the runtime engine
+				runtimeEngine.sendEvent(event,"timezone");
+				
+			}
 		}
 
 	}
